@@ -1,1 +1,186 @@
+# 🎬 TMDB Movie Data Analysis — Entertainment Industry Project
 
+An end-to-end data analysis project exploring 5,000 TMDB movie records to answer real streaming industry business questions. Data was cleaned and engineered in Python, then visualised in Tableau.
+
+---
+
+## Project Overview
+
+| Detail | Value |
+|---|---|
+| **Data source** | TMDB (The Movie Database) API |
+| **Raw rows** | 5,000 |
+| **Clean rows** | 4,682 |
+| **Columns (clean)** | 15 |
+| **Tools** | Python (stdlib only) · Tableau |
+
+---
+
+## Business Questions
+
+| # | Question | Business Relevance |
+|---|---|---|
+| Q1 | Does being popular actually mean being good? | Content acquisition & platform strategy |
+| Q2 | Which old movies are still pulling audiences today? | Catalog licensing & library acquisition |
+| Q3 | Which upcoming 2026–2027 movies are generating the most pre-release buzz? | Release forecasting & marketing spend |
+| Q4 | Are audiences rating movies more harshly in recent years? | Quality benchmarking & trend analysis |
+| Q5 | Which critically acclaimed movies are flying under the radar? | Recommendation engine & subscriber retention |
+
+---
+
+## Data Cleaning Steps
+
+### Raw data issues found
+
+| Issue | Count | Action |
+|---|---|---|
+| Exact duplicate rows (same title + release date) | 304 | Removed |
+| Missing `year` / `release_date` | 14 | Dropped |
+| Zero-vote / zero-rating rows | ~140 | Kept but flagged as unreliable |
+| Same-name films with different release dates | 384 titles | **Kept** — treated as distinct films |
+
+> Deduplication was done on `(title, release_date)` — not just title — to avoid removing legitimate films that share a name (e.g. two versions of *War of the Worlds*).
+
+---
+
+## Engineered Features
+
+| Column | Type | Logic |
+|---|---|---|
+| `popularity_tier` | String | `Viral` (≥50) · `Very High` (≥20) · `High` (≥10) · `Medium` (≥5) · `Low` (<5) — thresholds derived from data percentiles |
+| `rating_quality` | String | `Excellent` (≥8.0) · `Good` (≥7.0) · `Average` (≥6.0) · `Below Average` (≥5.0) · `Poor` (<5.0) · `No Rating` (0 votes) |
+| `decade` | String | Derived from `year` — e.g. `1990s`, `2020s` |
+| `is_reliable` | Boolean | `votes ≥ 50` — filters noise from low-sample ratings |
+| `is_upcoming` | Boolean | `year ≥ 2026` — flags unreleased films for Q3 |
+| `is_evergreen` | Boolean | `year < 2010 AND popularity > 20` — still trending decades later |
+| `is_hidden_gem` | Boolean | `rating ≥ 8.0 AND votes ≥ 100 AND popularity < median` |
+| `quadrant` | String | Q1 scatter quadrant — see below |
+| `pop_vs_rating_corr` | Float | Pearson r stored as a constant for Tableau reference |
+
+### Quadrant logic (Q1 scatter plot)
+
+Dividing lines: **median popularity of reliable films** (5.86) × **rating threshold of 7.0**
+
+| Quadrant | Meaning |
+|---|---|
+| `Viral + Quality` | High popularity AND rating ≥ 7.0 |
+| `Viral + Poor` | High popularity AND rating < 7.0 |
+| `Hidden Gem` | Low popularity AND rating ≥ 7.0 |
+| `Obscure` | Low popularity AND rating < 7.0 |
+| `Insufficient Data` | votes < 50 or no rating |
+
+---
+
+## Key Findings
+
+### Q1 — Popularity vs Rating
+
+> **Pearson r = 0.0792** (calculated on 3,981 films with votes ≥ 50)
+
+Near-zero correlation. Trending content does **not** reliably deliver audience satisfaction.
+
+| Quadrant | Count |
+|---|---|
+| Viral + Quality | 1,037 |
+| Viral + Poor | 954 |
+| Hidden Gem | 718 |
+| Obscure | 1,272 |
+
+**Recommendation:** Streaming platforms should decouple their homepage trending algorithm from their content acquisition strategy.
+
+---
+
+### Q2 — Catalog Longevity
+
+**86 pre-2010 films** still have a popularity score above 20 today — competing with recent releases for audience attention decades later. High-rated classics (rating ≥ 8) show the strongest retention.
+
+**Recommendation:** Catalog content from the 1990s–2000s with ratings above 7.5 justifies premium licensing investment for platforms building long-term subscriber retention.
+
+---
+
+### Q3 — Pre-Release Buzz (2026–2027)
+
+**192 unreleased films** are already appearing in TMDB trending data.
+
+| Title | Popularity | Year |
+|---|---|---|
+| Your Heart Will Be Broken | 1,340.9 | 2026 |
+| Avatar: Fire and Ash | 397.8 | 2025 |
+| Project Hail Mary | 314.9 | 2026 |
+| Scream 7 | 245.2 | 2026 |
+| Peaky Blinders: The Immortal Man | 230.4 | 2026 |
+
+**Recommendation:** Pre-release TMDB popularity ≥ 200 signals blockbuster-level anticipation — front-load marketing spend on titles crossing this threshold before any paid campaign launches.
+
+---
+
+### Q4 — Rating Trend 2018–2026
+
+*(Filtered: votes ≥ 50)*
+
+| Year | Avg Rating | Avg Popularity | n |
+|---|---|---|---|
+| 2018 | 6.86 | 7.44 | 123 |
+| 2019 | 6.99 | 7.95 | 137 |
+| 2020 | 7.16 | 7.31 | 75 |
+| 2021 | 7.00 | 8.38 | 105 |
+| 2022 | 7.08 | 7.84 | 128 |
+| 2023 | 7.03 | 8.94 | 161 |
+| 2024 | 6.74 | 8.13 | 198 |
+| 2025 | 6.67 | 15.82 | 316 |
+| 2026 | 6.66 | 85.69 | 56 |
+
+Ratings peaked 2020–2022 and have declined since. Average popularity in 2026 is **10× higher** than 2023 — more buzz, lower satisfaction.
+
+**Recommendation:** Platforms should recalibrate toward quality signals over content volume.
+
+---
+
+### Q5 — Hidden Gems
+
+**62 films** with rating ≥ 8.0, votes ≥ 100, and below-median popularity — verified quality content audiences aren't discovering.
+
+Sample titles:
+
+| Title | Year | Rating | Popularity |
+|---|---|---|---|
+| Paths of Glory | 1957 | 8.25 | 5.79 |
+| The Legend of 1900 | 1998 | 8.24 | 5.79 |
+| City of God | 2002 | 8.43 | 14.10 |
+| Seven Samurai | 1954 | 8.45 | 16.90 |
+
+**Recommendation:** A curated "critically acclaimed but undiscovered" shelf — films rated above 8.0 with below-median visibility — is a low-cost, high-satisfaction strategy for platforms competing against blockbuster-heavy rivals.
+
+---
+
+## Output Schema
+
+`tmdb_clean.csv` — 4,682 rows × 15 columns
+
+| Column | Description |
+|---|---|
+| `title` | Movie title |
+| `release_date` | Full release date (YYYY-MM-DD) |
+| `year` | Release year (integer) |
+| `decade` | Decade string (e.g. `1990s`) |
+| `popularity` | TMDB popularity score (float) |
+| `popularity_tier` | Viral / Very High / High / Medium / Low |
+| `rating` | Audience rating 0–10 (float) |
+| `rating_quality` | Excellent / Good / Average / Below Average / Poor / No Rating |
+| `votes` | Number of votes cast |
+| `is_reliable` | True if votes ≥ 50 |
+| `is_upcoming` | True if year ≥ 2026 |
+| `is_evergreen` | True if pre-2010 AND popularity > 20 |
+| `is_hidden_gem` | True if rating ≥ 8.0, votes ≥ 100, popularity < median |
+| `quadrant` | Q1 scatter quadrant label |
+| `pop_vs_rating_corr` | Pearson r = 0.0792 (stored as constant) |
+
+---
+
+## How to Run
+
+```bash
+python3 clean_tmdb.py
+```
+
+No external dependencies — uses Python standard library only (`csv`, `math`, `statistics`).
