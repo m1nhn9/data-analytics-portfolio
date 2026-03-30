@@ -1,22 +1,43 @@
-# Minh Tan Nguyen | Data Analytics Portfolio
+# Minh Tan Nguyen — Data Analytics Portfolio
 
-Welcome! I am a Artificial Intelligence & Business Analytics student at the University of South Florida. 
-I use data to uncover trends, automate workflows, and tell stories that drive business decisions.
+AI & Business Analytics student at the University of South Florida. I use data to uncover trends, automate workflows, and tell stories that drive business decisions.
 
-### Goals
-- Master the full ETL (Extract, Transform, Load) pipeline using Python and SQL.
-- Build interactive dashboards that translate complex data into actionable insights.
-- Transition into a Product Management role in the tech industry.
+---
 
-### Tech Stack
-- **Languages:** Python (Pandas, Requests, Matplotlib), SQL
-- **Tools:** VS Code, Jupyter Notebooks, Tableau/PowerBI, Git/GitHub
+## About Me
+
+| | |
+|---|---|
+| **Goal** | Transition into Product Management in the tech industry |
+| **Focus** | Full ETL pipeline · Interactive dashboards · Business insights |
+| **Stack** | Python · SQL · Tableau · Git/GitHub |
 
 ---
 
 ## Projects
 
-### [Project 1: TMDB Movie Insights](./project-1-tmdb-extraction/)
-- **Goal:** Extract and clean global movie data using the TMDB API.
-- **Tools:** Python, `requests`, `pandas`, `dotenv`.
-- **Key Insight:** Successfully handled API pagination and secured credentials via environment variables.
+### Project 1 — TMDB Movie Insights
+
+> Analysing 5,000 TMDB movie records to answer 5 real streaming industry business questions.
+
+| Detail | Value |
+|---|---|
+| **Data source** | TMDB (The Movie Database) API |
+| **Raw rows** | 5,000 |
+| **Clean rows** | 4,682 |
+| **Tools** | Python (stdlib) · Tableau |
+
+**Key finding:** Popularity and audience rating have a Pearson correlation of only **r = 0.079** — trending content does not reliably satisfy audiences.
+
+**[View Full Report →](./project-1-tmdb-analysis/report.html)**
+
+| File | Description |
+|---|---|
+| [`report.html`](./project-1-tmdb-analysis/report.html) | Full visual analysis report |
+| [`clean_tmdb.py`](./project-1-tmdb-analysis/clean_tmdb.py) | Data cleaning + feature engineering script |
+| [`tmdb_popular_movies.csv`](./project-1-tmdb-analysis/tmdb_popular_movies.csv) | Raw dataset (5,000 rows) |
+| [`tmdb_clean.csv`](./project-1-tmdb-analysis/tmdb_clean.csv) | Cleaned dataset (4,682 rows × 15 cols) |
+
+---
+
+*More projects coming soon.*

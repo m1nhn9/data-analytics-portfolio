@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMDB Movie Data Analysis Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0a0a0f;
+    --bg2:       #111118;
+    --bg3:       #1a1a24;
+    --border:    #2a2a38;
+    --text:      #e8e8f0;
+    --muted:     #7a7a95;
+    --accent1:   #7c6af7;
+    --accent2:   #3ecfb2;
+    --accent3:   #f5a623;
+    --accent4:   #e85d75;
+    --accent5:   #5bb8f5;
+    --good:      #3ecfb2;
+    --warn:      #f5a623;
+    --bad:       #e85d75;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0d0d1a 0%, #12101f 50%, #0a0f1a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 72px 40px 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 50%, rgba(124,106,247,.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 35% at 80% 50%, rgba(62,207,178,.10) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent1);
+    background: rgba(124,106,247,.12);
+    border: 1px solid rgba(124,106,247,.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    margin-bottom: 22px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #a89ff5 50%, #3ecfb2 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 16px; color: var(--muted); max-width: 560px; margin: 0 auto 36px;
+  }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat .num {
+    font-size: 32px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-stat .lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 56px 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent1); margin-bottom: 10px;
+  }
+  .section-title {
+    font-size: clamp(20px, 3vw, 28px); font-weight: 700; letter-spacing: -.01em;
+    margin-bottom: 8px;
+  }
+  .section-desc { font-size: 14px; color: var(--muted); margin-bottom: 32px; max-width: 640px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .card-grid { display: grid; gap: 16px; }
+  .card-grid-2 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .card-grid-3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .card-grid-4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+
+  /* ── CLEANING TABLE ── */
+  .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--bg3); }
+  th {
+    text-align: left; padding: 12px 16px;
+    font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); border-bottom: 1px solid var(--border);
+  }
+  td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 500;
+    padding: 2px 10px; border-radius: 20px; white-space: nowrap;
+  }
+  .badge-removed  { background: rgba(232,93,117,.12); color: #e85d75; border: 1px solid rgba(232,93,117,.25); }
+  .badge-kept     { background: rgba(62,207,178,.12);  color: #3ecfb2; border: 1px solid rgba(62,207,178,.25); }
+  .badge-flagged  { background: rgba(245,166,35,.12);  color: #f5a623; border: 1px solid rgba(245,166,35,.25); }
+
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent2); }
+
+  /* ── METRIC CARDS ── */
+  .metric-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 24px;
+    position: relative; overflow: hidden;
+  }
+  .metric-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .mc-purple::before { background: linear-gradient(90deg, var(--accent1), transparent); }
+  .mc-teal::before   { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .mc-orange::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+  .mc-pink::before   { background: linear-gradient(90deg, var(--accent4), transparent); }
+  .mc-blue::before   { background: linear-gradient(90deg, var(--accent5), transparent); }
+
+  .metric-icon { font-size: 22px; margin-bottom: 10px; }
+  .metric-val {
+    font-size: 36px; font-weight: 800; letter-spacing: -.02em;
+    line-height: 1; margin-bottom: 4px;
+  }
+  .metric-val.purple { color: var(--accent1); }
+  .metric-val.teal   { color: var(--accent2); }
+  .metric-val.orange { color: var(--accent3); }
+  .metric-val.pink   { color: var(--accent4); }
+  .metric-val.blue   { color: var(--accent5); }
+  .metric-label { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .metric-sub   { font-size: 12px; color: var(--muted); }
+
+  /* ── Q CARDS ── */
+  .q-section {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 28px 24px; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .q-section::before {
+    content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+  }
+  .q1::before { background: var(--accent1); }
+  .q2::before { background: var(--accent2); }
+  .q3::before { background: var(--accent3); }
+  .q4::before { background: var(--accent4); }
+  .q5::before { background: var(--accent5); }
+
+  .q-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+  .q-num {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .qn1 { background: rgba(124,106,247,.2); color: var(--accent1); }
+  .qn2 { background: rgba(62,207,178,.2);  color: var(--accent2); }
+  .qn3 { background: rgba(245,166,35,.2);  color: var(--accent3); }
+  .qn4 { background: rgba(232,93,117,.2);  color: var(--accent4); }
+  .qn5 { background: rgba(91,184,245,.2);  color: var(--accent5); }
+
+  .q-title { font-size: 16px; font-weight: 600; line-height: 1.4; }
+  .q-tags  { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tag {
+    font-size: 11px; font-weight: 500;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .tag-purple { background: rgba(124,106,247,.12); color: var(--accent1); border: 1px solid rgba(124,106,247,.2); }
+  .tag-teal   { background: rgba(62,207,178,.12);  color: var(--accent2); border: 1px solid rgba(62,207,178,.2); }
+  .tag-orange { background: rgba(245,166,35,.12);  color: var(--accent3); border: 1px solid rgba(245,166,35,.2); }
+  .tag-pink   { background: rgba(232,93,117,.12);  color: var(--accent4); border: 1px solid rgba(232,93,117,.2); }
+  .tag-blue   { background: rgba(91,184,245,.12);  color: var(--accent5); border: 1px solid rgba(91,184,245,.2); }
+
+  .finding-box {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 16px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .finding-box strong { color: var(--text); }
+
+  .rec-box {
+    background: rgba(124,106,247,.06); border: 1px solid rgba(124,106,247,.2);
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 13px; color: var(--muted); line-height: 1.6;
+    border-left: 3px solid var(--accent1);
+  }
+  .rec-box.teal   { background: rgba(62,207,178,.05);  border-color: rgba(62,207,178,.2);  border-left-color: var(--accent2); }
+  .rec-box.orange { background: rgba(245,166,35,.05);  border-color: rgba(245,166,35,.2);  border-left-color: var(--accent3); }
+  .rec-box.pink   { background: rgba(232,93,117,.05);  border-color: rgba(232,93,117,.2);  border-left-color: var(--accent4); }
+  .rec-box.blue   { background: rgba(91,184,245,.05);  border-color: rgba(91,184,245,.2);  border-left-color: var(--accent5); }
+  .rec-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    margin-bottom: 6px; color: var(--accent1);
+  }
+  .rec-box.teal   .rec-label { color: var(--accent2); }
+  .rec-box.orange .rec-label { color: var(--accent3); }
+  .rec-box.pink   .rec-label { color: var(--accent4); }
+  .rec-box.blue   .rec-label { color: var(--accent5); }
+
+  /* ── BAR CHART ── */
+  .bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .bar-lbl { font-size: 12px; min-width: 100px; color: var(--text); }
+  .bar-track { flex: 1; height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .6s ease; }
+  .bar-count { font-size: 12px; color: var(--muted); min-width: 40px; text-align: right; }
+
+  /* ── TREND TABLE ── */
+  .trend-row { display: grid; grid-template-columns: 60px 1fr 80px 1fr 80px 40px; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .trend-row:last-child { border-bottom: none; }
+  .trend-year { font-weight: 600; color: var(--muted); }
+  .trend-bar-track { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .trend-bar-fill  { height: 100%; border-radius: 3px; }
+  .trend-n { font-size: 11px; color: var(--muted); text-align: right; }
+
+  /* ── SCHEMA TABLE ── */
+  .schema-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--accent3);
+    background: rgba(245,166,35,.08);
+    padding: 2px 8px; border-radius: 4px;
+  }
+  .schema-flag {
+    font-size: 11px; font-weight: 500;
+    padding: 2px 10px; border-radius: 20px;
+    background: rgba(62,207,178,.1); color: var(--accent2);
+    border: 1px solid rgba(62,207,178,.2);
+  }
+  .col-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--accent2);
+  }
+
+  /* ── QUADRANT GRID ── */
+  .quad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .quad-card {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .quad-title { font-size: 13px; font-weight: 600; }
+  .quad-count { font-size: 24px; font-weight: 800; }
+  .quad-desc  { font-size: 11px; color: var(--muted); }
+  .quad-vq  .quad-count { color: var(--accent2); }
+  .quad-vp  .quad-count { color: var(--accent4); }
+  .quad-hg  .quad-count { color: var(--accent1); }
+  .quad-ob  .quad-count { color: var(--muted); }
+
+  /* ── UPCOMING TABLE ── */
+  .rank-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-num {
+    font-size: 12px; font-weight: 700; color: var(--muted);
+    min-width: 24px;
+  }
+  .rank-title { flex: 1; font-size: 13px; font-weight: 500; }
+  .rank-year { font-size: 12px; color: var(--muted); }
+  .rank-pop {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 600; color: var(--accent3);
+    min-width: 64px; text-align: right;
+  }
+  .pop-bar-wrap { width: 80px; }
+  .pop-bar-bg { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .pop-bar-fg { height: 100%; background: var(--accent3); border-radius: 2px; }
+
+  /* ── HIDDEN GEMS TABLE ── */
+  .gem-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 11px 0; border-bottom: 1px solid var(--border);
+  }
+  .gem-row:last-child { border-bottom: none; }
+  .gem-title { flex: 1; font-size: 13px; font-weight: 500; }
+  .gem-year  { font-size: 12px; color: var(--muted); min-width: 36px; }
+  .gem-rating {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; font-weight: 600; color: var(--accent2);
+    min-width: 36px; text-align: right;
+  }
+  .gem-pop {
+    font-size: 12px; color: var(--muted);
+    min-width: 60px; text-align: right;
+  }
+
+  /* ── CORR CALLOUT ── */
+  .corr-callout {
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px 28px; margin-bottom: 20px;
+  }
+  .corr-r {
+    font-size: 56px; font-weight: 800; letter-spacing: -.03em;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    line-height: 1;
+  }
+  .corr-text { flex: 1; min-width: 200px; }
+  .corr-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .corr-text p  { font-size: 13px; color: var(--muted); }
+
+  /* ── TOOLS ROW ── */
+  .tools-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+  .tool-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 16px;
+    font-size: 13px; font-weight: 500;
+  }
+  .tool-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center; padding: 40px 24px;
+    font-size: 12px; color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+  footer a { color: var(--accent1); text-decoration: none; }
+
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HERO ═══════════════════════════════ -->
+<div class="hero">
+  <div class="hero-badge">Data Analysis Project</div>
+  <h1>TMDB Movie Data Analysis<br>Entertainment Industry Report</h1>
+  <p class="hero-sub">Cleaning, feature engineering, and correlation analysis on 5,000 TMDB records — powering 5 streaming industry business questions.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">5,000</div><div class="lbl">Raw Rows</div></div>
+    <div class="hero-stat"><div class="num">4,682</div><div class="lbl">Clean Rows</div></div>
+    <div class="hero-stat"><div class="num">15</div><div class="lbl">Columns</div></div>
+    <div class="hero-stat"><div class="num">0.079</div><div class="lbl">Pearson r (pop vs rating)</div></div>
+    <div class="hero-stat"><div class="num">62</div><div class="lbl">Hidden Gems Found</div></div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════════════════ TOOLS ════════════════════════════════ -->
+<section>
+  <div class="section-label">Stack</div>
+  <div class="section-title">Tools Used</div>
+  <div class="tools-row">
+    <div class="tool-chip"><div class="tool-dot" style="background:#3ecfb2"></div>Python 3 (stdlib only)</div>
+    <div class="tool-chip"><div class="tool-dot" style="background:#7c6af7"></div>csv · math · statistics</div>
+    <div class="tool-chip"><div class="tool-dot" style="background:#f5a623"></div>Tableau (dashboard)</div>
+    <div class="tool-chip"><div class="tool-dot" style="background:#5bb8f5"></div>TMDB API (source data)</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ BUSINESS QUESTIONS ═══════════════════════ -->
+<section>
+  <div class="section-label">Scope</div>
+  <div class="section-title">5 Business Questions</div>
+  <div class="section-desc">Each question maps to a real decision framework used by streaming platforms and studios.</div>
+
+  <div class="card-grid card-grid-2">
+    <div class="card" style="border-left: 3px solid var(--accent1);">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent1);margin-bottom:8px;">Q1 · Content Strategy</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Does popularity = quality?</div>
+      <div style="font-size:12px;color:var(--muted);">Correlation between trending scores and audience ratings</div>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--accent2);">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:8px;">Q2 · Library Acquisition</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Which old movies still pull audiences?</div>
+      <div style="font-size:12px;color:var(--muted);">Catalog longevity and evergreen content value</div>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--accent3);">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px;">Q3 · Release Forecasting</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Which 2026–2027 films are generating buzz?</div>
+      <div style="font-size:12px;color:var(--muted);">Pre-release popularity as a marketing signal</div>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--accent4);">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent4);margin-bottom:8px;">Q4 · Audience Insight</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Are audiences rating films more harshly?</div>
+      <div style="font-size:12px;color:var(--muted);">Average rating trend 2018–2026 vs popularity surge</div>
+    </div>
+    <div class="card" style="border-left: 3px solid var(--accent5); grid-column: span 2 / span 2;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent5);margin-bottom:8px;">Q5 · Recommendation Engine</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px;">Which critically acclaimed films are flying under the radar?</div>
+      <div style="font-size:12px;color:var(--muted);">Surfacing high-quality, low-visibility content as a low-cost subscriber retention strategy</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ DATA CLEANING ══════════════════════════ -->
+<section>
+  <div class="section-label">Pipeline</div>
+  <div class="section-title">Data Cleaning</div>
+  <div class="section-desc">Four issues identified and resolved before any analysis was run.</div>
+
+  <div class="table-wrap" style="margin-bottom:24px;">
+    <table>
+      <thead>
+        <tr><th>Issue</th><th>Count</th><th>Action</th><th>Reasoning</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Exact duplicate rows</td>
+          <td><span style="font-weight:600;color:var(--accent4);">304</span></td>
+          <td><span class="badge badge-removed">Removed</span></td>
+          <td style="color:var(--muted);font-size:12px;">Deduped on <span class="mono">(title, release_date)</span> — not title alone, to preserve same-name films</td>
+        </tr>
+        <tr>
+          <td>Missing <span class="mono">year</span> / <span class="mono">release_date</span></td>
+          <td><span style="font-weight:600;color:var(--accent4);">14</span></td>
+          <td><span class="badge badge-removed">Dropped</span></td>
+          <td style="color:var(--muted);font-size:12px;">Required for Q2, Q3, Q4 — rows with no year are unusable</td>
+        </tr>
+        <tr>
+          <td>Zero-vote / zero-rating rows</td>
+          <td><span style="font-weight:600;color:var(--accent3);">~140</span></td>
+          <td><span class="badge badge-flagged">Flagged</span></td>
+          <td style="color:var(--muted);font-size:12px;">Kept for upcoming films (expected); marked <span class="mono">is_reliable = False</span></td>
+        </tr>
+        <tr>
+          <td>Same-name films (different years)</td>
+          <td><span style="font-weight:600;color:var(--accent2);">384 titles</span></td>
+          <td><span class="badge badge-kept">Kept</span></td>
+          <td style="color:var(--muted);font-size:12px;">e.g. <em>War of the Worlds</em> (2005) and <em>War of the Worlds</em> (2025) are distinct</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-grid card-grid-3">
+    <div class="metric-card mc-purple">
+      <div class="metric-icon">📥</div>
+      <div class="metric-val purple">5,000</div>
+      <div class="metric-label">Raw rows loaded</div>
+      <div class="metric-sub">From TMDB API extract</div>
+    </div>
+    <div class="metric-card mc-orange" style="border-color:rgba(245,166,35,.2)">
+      <div class="metric-icon">🗑️</div>
+      <div class="metric-val orange">318</div>
+      <div class="metric-label">Rows removed</div>
+      <div class="metric-sub">304 duplicates + 14 null year</div>
+    </div>
+    <div class="metric-card mc-teal">
+      <div class="metric-icon">✅</div>
+      <div class="metric-val teal">4,682</div>
+      <div class="metric-label">Clean rows exported</div>
+      <div class="metric-sub">Ready for Tableau</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ ENGINEERED FEATURES ════════════════════════ -->
+<section>
+  <div class="section-label">Feature Engineering</div>
+  <div class="section-title">Calculated Columns</div>
+  <div class="section-desc">9 new columns derived to power each business question directly in Tableau.</div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Column</th><th>Type</th><th>Logic</th><th>Used In</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="col-name">popularity_tier</span></td>
+          <td><span class="schema-type">string</span></td>
+          <td style="font-size:12px;color:var(--muted);">Viral ≥50 · Very High ≥20 · High ≥10 · Medium ≥5 · Low &lt;5 — thresholds from p90/p95 percentiles</td>
+          <td style="font-size:12px;">Q1, Q3</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">rating_quality</span></td>
+          <td><span class="schema-type">string</span></td>
+          <td style="font-size:12px;color:var(--muted);">Excellent ≥8 · Good ≥7 · Average ≥6 · Below Average ≥5 · Poor &lt;5 · No Rating (0 votes)</td>
+          <td style="font-size:12px;">Q1, Q5</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">decade</span></td>
+          <td><span class="schema-type">string</span></td>
+          <td style="font-size:12px;color:var(--muted);">Derived from year — e.g. <span class="mono">1990s</span>, <span class="mono">2020s</span></td>
+          <td style="font-size:12px;">Q2, Q4</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">is_reliable</span></td>
+          <td><span class="schema-type">boolean</span></td>
+          <td style="font-size:12px;color:var(--muted);">votes ≥ 50 — filters noise from single-reviewer ratings</td>
+          <td style="font-size:12px;">Q1, Q4</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">is_upcoming</span></td>
+          <td><span class="schema-type">boolean</span></td>
+          <td style="font-size:12px;color:var(--muted);">year ≥ 2026</td>
+          <td style="font-size:12px;">Q3</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">is_evergreen</span></td>
+          <td><span class="schema-type">boolean</span></td>
+          <td style="font-size:12px;color:var(--muted);">year &lt; 2010 AND popularity &gt; 20 — old films still competing with new releases</td>
+          <td style="font-size:12px;">Q2</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">is_hidden_gem</span></td>
+          <td><span class="schema-type">boolean</span></td>
+          <td style="font-size:12px;color:var(--muted);">rating ≥ 8.0 AND votes ≥ 100 AND popularity &lt; overall median (5.86)</td>
+          <td style="font-size:12px;">Q5</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">quadrant</span></td>
+          <td><span class="schema-type">string</span></td>
+          <td style="font-size:12px;color:var(--muted);">Viral+Quality / Viral+Poor / Hidden Gem / Obscure — divided by median popularity × rating 7.0</td>
+          <td style="font-size:12px;">Q1</td>
+        </tr>
+        <tr>
+          <td><span class="col-name">pop_vs_rating_corr</span></td>
+          <td><span class="schema-type">float</span></td>
+          <td style="font-size:12px;color:var(--muted);">Pearson r = 0.0792 — stored as constant for Tableau reference line</td>
+          <td style="font-size:12px;">Q1</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ FINDINGS ════════════════════════════ -->
+<section>
+  <div class="section-label">Analysis</div>
+  <div class="section-title">Key Findings</div>
+  <div class="section-desc">One finding per business question, with data-backed recommendations.</div>
+
+  <!-- Q1 -->
+  <div class="q-section q1">
+    <div class="q-header">
+      <div class="q-num qn1">Q1</div>
+      <div class="q-title">Does popularity actually mean quality?</div>
+    </div>
+    <div class="q-tags">
+      <span class="tag tag-purple">Content Acquisition</span>
+      <span class="tag tag-purple">Platform Strategy</span>
+    </div>
+
+    <div class="corr-callout">
+      <div class="corr-r">r = 0.079</div>
+      <div class="corr-text">
+        <h3>Near-zero correlation</h3>
+        <p>Calculated via Pearson on <strong>3,981 reliable films</strong> (votes ≥ 50). Trending and quality are essentially independent variables — viral content does not reliably satisfy audiences.</p>
+      </div>
+    </div>
+
+    <div class="quad-grid" style="margin-bottom:16px;">
+      <div class="quad-card quad-vq">
+        <div class="quad-title">Viral + Quality</div>
+        <div class="quad-count">1,037</div>
+        <div class="quad-desc">High popularity AND rating ≥ 7.0</div>
+      </div>
+      <div class="quad-card quad-vp">
+        <div class="quad-title">Viral + Poor</div>
+        <div class="quad-count">954</div>
+        <div class="quad-desc">High popularity AND rating &lt; 7.0</div>
+      </div>
+      <div class="quad-card quad-hg">
+        <div class="quad-title">Hidden Gem</div>
+        <div class="quad-count">718</div>
+        <div class="quad-desc">Low popularity AND rating ≥ 7.0</div>
+      </div>
+      <div class="quad-card quad-ob">
+        <div class="quad-title">Obscure</div>
+        <div class="quad-count">1,272</div>
+        <div class="quad-desc">Low popularity AND rating &lt; 7.0</div>
+      </div>
+    </div>
+
+    <div class="rec-box">
+      <div class="rec-label">Business Recommendation</div>
+      Streaming platforms should decouple their homepage trending algorithm from their content acquisition strategy — the data shows viral content does not reliably deliver audience satisfaction.
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-section q2">
+    <div class="q-header">
+      <div class="q-num qn2">Q2</div>
+      <div class="q-title">Which old movies are still pulling audiences today?</div>
+    </div>
+    <div class="q-tags">
+      <span class="tag tag-teal">Catalog Strategy</span>
+      <span class="tag tag-teal">Library Acquisition</span>
+    </div>
+
+    <div class="finding-box" style="margin-bottom:16px;">
+      <strong>86 pre-2010 films</strong> still have a popularity score above 20 today — competing with recent releases decades later. High-rated classics (rating ≥ 8) show the strongest retention.
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div class="bar-row">
+        <div class="bar-lbl">1990s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--accent2);"></div></div>
+        <div class="bar-count" style="color:var(--accent2);">Strongest</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-lbl">2000s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--accent2);opacity:.8"></div></div>
+        <div class="bar-count" style="color:var(--muted);">Strong</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-lbl">1980s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:34%;background:var(--accent2);opacity:.6"></div></div>
+        <div class="bar-count" style="color:var(--muted);">Moderate</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-lbl">1970s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--accent2);opacity:.4"></div></div>
+        <div class="bar-count" style="color:var(--muted);">Low</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-lbl">Pre-1970</div>
+        <div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--accent2);opacity:.3"></div></div>
+        <div class="bar-count" style="color:var(--muted);">Minimal</div>
+      </div>
+    </div>
+
+    <div class="rec-box teal">
+      <div class="rec-label">Business Recommendation</div>
+      Catalog content from the 1990s–2000s with ratings above 7.5 shows sustained audience engagement 20+ years post-release — justifying premium licensing investment for platforms building long-term subscriber retention.
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-section q3">
+    <div class="q-header">
+      <div class="q-num qn3">Q3</div>
+      <div class="q-title">Which 2026–2027 films are generating the most pre-release buzz?</div>
+    </div>
+    <div class="q-tags">
+      <span class="tag tag-orange">Release Forecasting</span>
+      <span class="tag tag-orange">Marketing Strategy</span>
+    </div>
+
+    <div class="finding-box" style="margin-bottom:16px;">
+      <strong>192 unreleased films</strong> already appearing in TMDB trending data. Pre-release popularity of 200+ signals blockbuster-level anticipation.
+    </div>
+
+    <div class="card" style="margin-bottom:16px;padding:16px 20px;">
+      <div class="rank-row">
+        <div class="rank-num">#1</div>
+        <div class="rank-title">Your Heart Will Be Broken</div>
+        <div class="rank-year">2026</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:100%"></div></div></div>
+        <div class="rank-pop">1,340.9</div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-num">#2</div>
+        <div class="rank-title">Avatar: Fire and Ash</div>
+        <div class="rank-year">2025</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:30%"></div></div></div>
+        <div class="rank-pop">397.8</div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-num">#3</div>
+        <div class="rank-title">Project Hail Mary</div>
+        <div class="rank-year">2026</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:23%"></div></div></div>
+        <div class="rank-pop">314.9</div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-num">#4</div>
+        <div class="rank-title">Scream 7</div>
+        <div class="rank-year">2026</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:18%"></div></div></div>
+        <div class="rank-pop">245.2</div>
+      </div>
+      <div class="rank-row">
+        <div class="rank-num">#5</div>
+        <div class="rank-title">Peaky Blinders: The Immortal Man</div>
+        <div class="rank-year">2026</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:17%"></div></div></div>
+        <div class="rank-pop">230.4</div>
+      </div>
+    </div>
+
+    <div class="rec-box orange">
+      <div class="rec-label">Business Recommendation</div>
+      Studios should prioritise marketing investment in titles crossing the 200 popularity threshold early — organic buzz is already building before any paid campaign launches.
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-section q4">
+    <div class="q-header">
+      <div class="q-num qn4">Q4</div>
+      <div class="q-title">Are audiences rating movies more harshly in recent years?</div>
+    </div>
+    <div class="q-tags">
+      <span class="tag tag-pink">Audience Insight</span>
+      <span class="tag tag-pink">Quality Benchmarking</span>
+    </div>
+
+    <div class="finding-box" style="margin-bottom:20px;">
+      Ratings <strong>peaked 2020–2022</strong> (~7.0+) and have declined since. Average popularity in 2026 is <strong>10× higher</strong> than 2023 — more buzz, lower satisfaction.
+    </div>
+
+    <!-- Rating bars -->
+    <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Average Rating (votes ≥ 50)</div>
+    <div style="margin-bottom:20px;">
+      <div class="bar-row"><div class="bar-lbl">2018</div><div class="bar-track"><div class="bar-fill" style="width:68.6%;background:var(--accent4);"></div></div><div class="bar-count">6.86</div></div>
+      <div class="bar-row"><div class="bar-lbl">2019</div><div class="bar-track"><div class="bar-fill" style="width:69.9%;background:var(--accent4);"></div></div><div class="bar-count">6.99</div></div>
+      <div class="bar-row"><div class="bar-lbl">2020</div><div class="bar-track"><div class="bar-fill" style="width:71.6%;background:var(--accent2);"></div></div><div class="bar-count" style="color:var(--accent2)">7.16 ▲</div></div>
+      <div class="bar-row"><div class="bar-lbl">2021</div><div class="bar-track"><div class="bar-fill" style="width:70.0%;background:var(--accent4);"></div></div><div class="bar-count">7.00</div></div>
+      <div class="bar-row"><div class="bar-lbl">2022</div><div class="bar-track"><div class="bar-fill" style="width:70.8%;background:var(--accent4);"></div></div><div class="bar-count">7.08</div></div>
+      <div class="bar-row"><div class="bar-lbl">2023</div><div class="bar-track"><div class="bar-fill" style="width:70.3%;background:var(--accent4);"></div></div><div class="bar-count">7.03</div></div>
+      <div class="bar-row"><div class="bar-lbl">2024</div><div class="bar-track"><div class="bar-fill" style="width:67.4%;background:var(--bad);opacity:.8"></div></div><div class="bar-count" style="color:var(--bad)">6.74 ▼</div></div>
+      <div class="bar-row"><div class="bar-lbl">2025</div><div class="bar-track"><div class="bar-fill" style="width:66.7%;background:var(--bad);opacity:.9"></div></div><div class="bar-count" style="color:var(--bad)">6.67 ▼</div></div>
+      <div class="bar-row"><div class="bar-lbl">2026*</div><div class="bar-track"><div class="bar-fill" style="width:66.6%;background:var(--bad);"></div></div><div class="bar-count" style="color:var(--bad)">6.66 ▼</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:20px;">*2026 partial data (n=56)</div>
+
+    <div class="rec-box pink">
+      <div class="rec-label">Business Recommendation</div>
+      Despite a 10× surge in content popularity since 2021, average audience ratings have declined — suggesting the industry is producing more discoverable but less satisfying content. Platforms should recalibrate toward quality signals over volume.
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-section q5">
+    <div class="q-header">
+      <div class="q-num qn5">Q5</div>
+      <div class="q-title">Which critically acclaimed films are flying under the radar?</div>
+    </div>
+    <div class="q-tags">
+      <span class="tag tag-blue">Recommendation Engine</span>
+      <span class="tag tag-blue">Subscriber Retention</span>
+    </div>
+
+    <div class="finding-box" style="margin-bottom:16px;">
+      <strong>62 films</strong> identified with rating ≥ 8.0, votes ≥ 100, and popularity below the dataset median (5.86). Verified quality content that audiences simply aren't finding.
+    </div>
+
+    <div class="card" style="margin-bottom:16px;padding:16px 20px;">
+      <div style="display:grid;grid-template-columns:1fr 60px 60px 80px;gap:8px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+        <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Title</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">Year</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:right;">Rating</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:right;">Popularity</div>
+      </div>
+      <div class="gem-row"><div class="gem-title">Seven Samurai</div><div class="gem-year">1954</div><div class="gem-rating">8.45</div><div class="gem-pop">16.90</div></div>
+      <div class="gem-row"><div class="gem-title">Life is Beautiful</div><div class="gem-year">1997</div><div class="gem-rating">8.44</div><div class="gem-pop">13.80</div></div>
+      <div class="gem-row"><div class="gem-title">City of God</div><div class="gem-year">2002</div><div class="gem-rating">8.43</div><div class="gem-pop">14.10</div></div>
+      <div class="gem-row"><div class="gem-title">Paths of Glory</div><div class="gem-year">1957</div><div class="gem-rating">8.25</div><div class="gem-pop">5.79</div></div>
+      <div class="gem-row"><div class="gem-title">The Legend of 1900</div><div class="gem-year">1998</div><div class="gem-rating">8.24</div><div class="gem-pop">5.79</div></div>
+      <div class="gem-row"><div class="gem-title">Togo</div><div class="gem-year">2019</div><div class="gem-rating">8.13</div><div class="gem-pop">5.77</div></div>
+    </div>
+
+    <div class="rec-box blue">
+      <div class="rec-label">Business Recommendation</div>
+      A curated "critically acclaimed but undiscovered" content shelf — sourced from films rated above 8.0 with below-median visibility — is a low-cost, high-satisfaction strategy that smaller streaming platforms can use to compete against blockbuster-heavy rivals.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ OUTPUT SCHEMA ════════════════════════════ -->
+<section>
+  <div class="section-label">Output</div>
+  <div class="section-title">Clean Dataset Schema</div>
+  <div class="section-desc"><span class="mono">tmdb_clean.csv</span> — 4,682 rows × 15 columns, ready to connect directly to Tableau.</div>
+
+  <div class="card-grid card-grid-4" style="margin-bottom:24px;">
+    <div class="metric-card mc-teal">
+      <div class="metric-val teal" style="font-size:28px;">4,682</div>
+      <div class="metric-label">Total rows</div>
+    </div>
+    <div class="metric-card mc-purple">
+      <div class="metric-val purple" style="font-size:28px;">15</div>
+      <div class="metric-label">Columns</div>
+    </div>
+    <div class="metric-card mc-orange">
+      <div class="metric-val orange" style="font-size:28px;">9</div>
+      <div class="metric-label">Engineered features</div>
+    </div>
+    <div class="metric-card mc-pink">
+      <div class="metric-val pink" style="font-size:28px;">0</div>
+      <div class="metric-label">External dependencies</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Column</th><th>Type</th><th>Description</th><th>Source</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="col-name">title</span></td><td><span class="schema-type">string</span></td><td style="font-size:12px;color:var(--muted);">Movie title</td><td style="font-size:12px;color:var(--muted);">Raw</td></tr>
+        <tr><td><span class="col-name">release_date</span></td><td><span class="schema-type">string</span></td><td style="font-size:12px;color:var(--muted);">Full release date (YYYY-MM-DD)</td><td style="font-size:12px;color:var(--muted);">Raw</td></tr>
+        <tr><td><span class="col-name">year</span></td><td><span class="schema-type">int</span></td><td style="font-size:12px;color:var(--muted);">Release year</td><td style="font-size:12px;color:var(--muted);">Raw</td></tr>
+        <tr><td><span class="col-name">decade</span></td><td><span class="schema-type">string</span></td><td style="font-size:12px;color:var(--muted);">Decade label e.g. 1990s, 2020s</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">popularity</span></td><td><span class="schema-type">float</span></td><td style="font-size:12px;color:var(--muted);">TMDB popularity score</td><td style="font-size:12px;color:var(--muted);">Raw</td></tr>
+        <tr><td><span class="col-name">popularity_tier</span></td><td><span class="schema-type">string</span></td><td style="font-size:12px;color:var(--muted);">Viral / Very High / High / Medium / Low</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">rating</span></td><td><span class="schema-type">float</span></td><td style="font-size:12px;color:var(--muted);">Audience rating 0–10</td><td style="font-size:12px;color:var(--muted);">Raw</td></tr>
+        <tr><td><span class="col-name">rating_quality</span></td><td><span class="schema-type">string</span></td><td style="font-size:12px;color:var(--muted);">Excellent / Good / Average / Below Average / Poor / No Rating</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">votes</span></td><td><span class="schema-type">int</span></td><td style="font-size:12px;color:var(--muted);">Number of votes cast</td><td style="font-size:12px;color:var(--muted);">Raw</td></tr>
+        <tr><td><span class="col-name">is_reliable</span></td><td><span class="schema-type">boolean</span></td><td style="font-size:12px;color:var(--muted);">True if votes ≥ 50</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">is_upcoming</span></td><td><span class="schema-type">boolean</span></td><td style="font-size:12px;color:var(--muted);">True if year ≥ 2026</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">is_evergreen</span></td><td><span class="schema-type">boolean</span></td><td style="font-size:12px;color:var(--muted);">True if pre-2010 AND popularity &gt; 20</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">is_hidden_gem</span></td><td><span class="schema-type">boolean</span></td><td style="font-size:12px;color:var(--muted);">True if rating ≥ 8.0, votes ≥ 100, popularity &lt; median</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">quadrant</span></td><td><span class="schema-type">string</span></td><td style="font-size:12px;color:var(--muted);">Q1 scatter quadrant label</td><td><span class="schema-flag">Engineered</span></td></tr>
+        <tr><td><span class="col-name">pop_vs_rating_corr</span></td><td><span class="schema-type">float</span></td><td style="font-size:12px;color:var(--muted);">Pearson r = 0.0792, stored as constant</td><td><span class="schema-flag">Engineered</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ HOW TO RUN ════════════════════════════ -->
+<section>
+  <div class="section-label">Reproducibility</div>
+  <div class="section-title">How to Run</div>
+  <div class="section-desc">No packages to install. Runs on any Python 3.x installation.</div>
+  <div class="card" style="font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2;">
+    <div><span style="color:var(--muted);"># clone and run</span></div>
+    <div><span style="color:var(--accent2);">python3</span> <span style="color:var(--text);">clean_tmdb.py</span></div>
+    <div style="margin-top:8px;"><span style="color:var(--muted);"># output</span></div>
+    <div><span style="color:var(--accent3);">→</span> <span style="color:var(--text);">tmdb_clean.csv</span> <span style="color:var(--muted)">(4,682 rows × 15 cols)</span></div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  TMDB Movie Data Analysis &nbsp;·&nbsp; Built with Python &amp; Tableau &nbsp;·&nbsp;
+  Data sourced from <a href="#">TMDB API</a>
+</footer>
+
+</body>
+</html>
