@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TMDB Film Market Analysis — Q1 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --dark:    #032541;
+  --blue:    #01B4E4;
+  --green:   #90CEA1;
+  --mint:    #AEEFD9;
+  --bg:      #E8EEF4;
+  --surface: #FFFFFF;
+  --surf2:   #EBF5FB;
+  --border:  rgba(3,37,65,0.12);
+  --bstrong: rgba(3,37,65,0.20);
+  --t1:      #032541;
+  --t2:      #345570;
+  --t3:      #7a9ab5;
+  --warn:    #9C3523;
+  --warn-bg: #FAEDE8;
+  --amber:   #7A5200;
+  --amber-bg:#FDF3D8;
+  --r-sm:6px; --r-md:10px; --r-lg:14px;
+  --font:'DM Sans',sans-serif;
+  --mono:'DM Mono',monospace;
+}
+
+html { font-size:16px; }
+body { font-family:var(--font); background:var(--bg); color:var(--t1); line-height:1.6; padding:2rem 1rem 5rem; }
+.page { max-width:820px; margin:0 auto; display:flex; flex-direction:column; gap:12px; }
+
+/* HEADER */
+.header { background:var(--dark); border-radius:var(--r-lg); padding:1.75rem 1.75rem 0; overflow:hidden; }
+.header-wordmark { display:flex; align-items:center; gap:10px; margin-bottom:1.25rem; }
+.tmdb-badge { background:var(--blue); border-radius:3px; padding:3px 7px; font-size:10px; font-weight:700; color:#fff; letter-spacing:0.06em; }
+.header-label { font-size:11px; font-weight:500; letter-spacing:0.09em; text-transform:uppercase; color:var(--green); }
+.header-body { display:flex; justify-content:space-between; align-items:flex-start; gap:20px; }
+.header-title { font-size:26px; font-weight:500; color:#fff; letter-spacing:-0.025em; line-height:1.2; }
+.header-sub { font-size:13.5px; color:rgba(255,255,255,0.55); margin-top:7px; max-width:440px; line-height:1.6; }
+.header-meta { text-align:right; font-size:11.5px; color:rgba(255,255,255,0.38); line-height:2; flex-shrink:0; }
+.header-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:14px; }
+.htag { font-size:11px; font-weight:500; padding:3px 9px; border-radius:20px; background:rgba(1,180,228,0.15); color:var(--blue); }
+.htag-g { background:rgba(144,206,161,0.15); color:var(--green); }
+.htag-m { background:rgba(174,239,217,0.12); color:var(--mint); }
+.metrics-bar { display:grid; grid-template-columns:repeat(5,1fr); margin:1.5rem -1.75rem 0; border-top:0.5px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); }
+.m-cell { padding:1rem 1.25rem; border-right:0.5px solid rgba(255,255,255,0.06); }
+.m-cell:last-child { border-right:none; }
+.m-val { font-size:21px; font-weight:500; letter-spacing:-0.02em; color:#fff; }
+.m-val-b { color:var(--blue); }
+.m-val-g { color:var(--green); }
+.m-lbl { font-size:11px; color:rgba(255,255,255,0.38); margin-top:3px; }
+
+/* ACCORDION NAV */
+.acc-nav { display:flex; gap:8px; flex-wrap:wrap; background:var(--surface); border:0.5px solid var(--bstrong); border-radius:var(--r-lg); padding:0.875rem 1rem; align-items:center; }
+.nav-label { font-size:11px; color:var(--t3); white-space:nowrap; }
+.acc-btn { font-family:var(--font); font-size:12px; font-weight:500; padding:5px 14px; border-radius:20px; border:0.5px solid var(--bstrong); background:transparent; color:var(--t2); cursor:pointer; transition:background 0.14s, color 0.14s, border-color 0.14s; }
+.acc-btn:hover { background:var(--surf2); border-color:var(--blue); color:var(--dark); }
+.acc-btn.active { background:var(--dark); color:#fff; border-color:var(--dark); }
+
+/* SECTIONS */
+.acc-section { display:none; flex-direction:column; gap:12px; }
+.acc-section.open { display:flex; }
+
+/* CARDS */
+.card { background:var(--surface); border:0.5px solid var(--bstrong); border-radius:var(--r-lg); padding:1.5rem; }
+hr.rule { border:none; border-top:0.5px solid var(--border); margin:1rem 0; }
+
+/* TYPE */
+.eyebrow { font-size:11px; font-weight:500; letter-spacing:0.09em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; color:var(--t1); }
+.body-text { font-size:13.5px; color:var(--t2); line-height:1.7; }
+
+/* BADGES */
+.badge { display:inline-flex; align-items:center; font-size:11px; font-weight:500; padding:3px 9px; border-radius:20px; white-space:nowrap; }
+.b-blue   { background:rgba(1,180,228,0.12); color:#0288b0; }
+.b-green  { background:rgba(144,206,161,0.20); color:#1a7a55; }
+.b-warn   { background:var(--warn-bg); color:var(--warn); }
+.b-amber  { background:var(--amber-bg); color:var(--amber); }
+.b-dark   { background:rgba(3,37,65,0.08); color:var(--t2); }
+.b-mint   { background:rgba(174,239,217,0.25); color:#0B6B50; }
+.q-tag { font-size:11px; font-weight:500; color:var(--dark); background:rgba(144,206,161,0.22); padding:2px 9px; border-radius:20px; }
+
+/* PIPELINE */
+.pipeline { display:flex; flex-direction:column; margin-top:1rem; }
+.pipe-step { display:flex; align-items:flex-start; gap:12px; padding:11px 0; border-bottom:0.5px solid var(--border); }
+.pipe-step:last-child { border-bottom:none; }
+.pipe-num { width:24px; height:24px; border-radius:50%; background:var(--dark); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:500; color:var(--blue); flex-shrink:0; margin-top:2px; }
+.pipe-title { font-size:13px; font-weight:500; color:var(--t1); margin-bottom:2px; }
+.pipe-detail { font-size:12px; color:var(--t2); line-height:1.55; }
+.pill-code { font-family:var(--mono); font-size:11px; color:var(--dark); background:rgba(1,180,228,0.12); padding:1px 6px; border-radius:4px; }
+
+/* FEATURE TABLE */
+.feat-table { width:100%; border-collapse:collapse; font-size:12.5px; margin-top:1rem; }
+.feat-table thead th { text-align:left; font-size:11px; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; color:var(--t3); padding:0 8px 8px 0; border-bottom:0.5px solid var(--bstrong); }
+.feat-table tbody td { padding:8px 8px 8px 0; border-bottom:0.5px solid var(--border); vertical-align:top; color:var(--t2); line-height:1.5; }
+.feat-table tbody tr:last-child td { border-bottom:none; }
+.feat-table code { font-family:var(--mono); font-size:11.5px; color:var(--dark); background:rgba(1,180,228,0.12); padding:1px 5px; border-radius:4px; }
+.type-pill { font-family:var(--mono); font-size:11px; color:var(--t3); background:var(--surf2); padding:1px 5px; border-radius:4px; }
+
+/* FINDINGS */
+.finding-hdr { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:10px; }
+.big-num { font-size:32px; font-weight:500; letter-spacing:-0.03em; color:var(--t1); line-height:1; }
+.big-lbl { font-size:11px; color:var(--t3); margin-top:3px; }
+
+/* STAT GRIDS */
+.stat-grid { display:grid; gap:6px; margin-bottom:12px; }
+.s4 { grid-template-columns:repeat(4,1fr); }
+.stat-box { background:var(--surf2); border-radius:var(--r-sm); padding:8px 10px; text-align:center; }
+.stat-box .val { font-size:16px; font-weight:500; }
+.stat-box .lbl { font-size:11px; color:var(--t3); margin-top:2px; }
+.stat-box .sub { font-size:10px; color:var(--t3); margin-top:1px; }
+
+/* RECOMMENDATION */
+.rec { border-left:2px solid var(--blue); padding:8px 12px; margin-top:12px; background:rgba(1,180,228,0.04); border-radius:0 var(--r-sm) var(--r-sm) 0; }
+.rec-lbl { font-size:11px; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; color:var(--blue); margin-bottom:4px; }
+.rec-text { font-size:13px; color:var(--t2); line-height:1.6; }
+
+/* TWO COL */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* BARS */
+.bar-row { display:flex; align-items:center; padding:7px 0; border-bottom:0.5px solid var(--border); font-size:13px; }
+.bar-row:last-child { border-bottom:none; }
+.bar-lbl { color:var(--t2); min-width:60px; }
+.bar-wrap { flex:1; margin:0 12px; height:4px; background:var(--surf2); border-radius:2px; }
+.bar-fill { height:4px; border-radius:2px; background:var(--green); }
+.bar-val { font-weight:500; color:var(--t1); min-width:70px; text-align:right; font-size:12px; }
+
+/* BUZZ LIST */
+.buzz-row { display:flex; align-items:baseline; gap:10px; padding:7px 0; border-bottom:0.5px solid var(--border); font-size:13px; }
+.buzz-row:last-child { border-bottom:none; }
+.buzz-rank { font-size:11px; color:var(--t3); font-family:var(--mono); min-width:18px; }
+.buzz-title { flex:1; color:var(--t1); font-weight:500; }
+.buzz-year { font-size:11px; color:var(--t3); margin-left:4px; font-weight:400; }
+.buzz-score { font-family:var(--mono); font-size:12px; color:var(--blue); font-weight:500; }
+
+/* TREND TABLE */
+.trend-row { display:flex; align-items:center; padding:7px 0; border-bottom:0.5px solid var(--border); font-size:13px; }
+.trend-row:last-child { border-bottom:none; }
+.trend-yr { color:var(--t2); min-width:44px; }
+.trend-bar-wrap { flex:1; margin:0 12px; height:4px; background:var(--surf2); border-radius:2px; }
+.trend-bar { height:4px; border-radius:2px; }
+.trend-val { font-weight:500; min-width:80px; text-align:right; font-size:12px; }
+
+/* GEM TABLE */
+.gem-table { width:100%; font-size:13px; }
+.gem-table thead th { font-size:11px; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; color:var(--t3); text-align:left; padding:0 0 8px; border-bottom:0.5px solid var(--bstrong); }
+.gem-table thead th:not(:first-child) { text-align:right; }
+.gem-table tbody td { padding:8px 0; border-bottom:0.5px solid var(--border); color:var(--t2); }
+.gem-table tbody tr:last-child td { border-bottom:none; }
+.gem-table tbody td:not(:first-child) { text-align:right; }
+.gem-title { font-weight:500; color:var(--t1); }
+.gem-year { font-size:11px; color:var(--t3); margin-left:5px; }
+.gem-rating { color:var(--dark); font-weight:500; }
+.gem-pop { color:var(--t3); font-family:var(--mono); font-size:12px; }
+
+/* SCHEMA */
+.schema-table { width:100%; border-collapse:collapse; font-size:12.5px; margin-top:1rem; }
+.schema-table thead th { text-align:left; font-size:11px; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; color:var(--t3); padding:0 8px 8px 0; border-bottom:0.5px solid var(--bstrong); }
+.schema-table tbody td { padding:7px 8px 7px 0; border-bottom:0.5px solid var(--border); color:var(--t2); vertical-align:top; line-height:1.5; }
+.schema-table tbody tr:last-child td { border-bottom:none; }
+.schema-table code { font-family:var(--mono); font-size:11.5px; color:var(--dark); background:rgba(1,180,228,0.12); padding:1px 5px; border-radius:4px; }
+.eng-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--blue); margin-right:4px; vertical-align:middle; }
+
+/* METRIC CELLS */
+.mc-row { display:flex; gap:8px; flex-shrink:0; }
+.mc { background:var(--surf2); border-radius:var(--r-sm); padding:0.6rem 0.875rem; text-align:center; min-width:60px; }
+.mc .v { font-size:20px; font-weight:500; letter-spacing:-0.02em; color:var(--t1); }
+.mc .l { font-size:11px; color:var(--t3); margin-top:2px; }
+
+/* CODE */
+.code-block { background:var(--dark); border-radius:var(--r-md); padding:1rem 1.25rem; margin-top:1rem; font-family:var(--mono); font-size:12.5px; line-height:1.7; overflow-x:auto; }
+.cc { color:rgba(144,206,161,0.45); }
+.ck { color:var(--green); }
+.co { color:var(--blue); }
+.ca { color:var(--mint); }
+
+/* FOOTER */
+.footer { background:var(--dark); border-radius:var(--r-lg); padding:1rem 1.5rem; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:rgba(255,255,255,0.38); margin-top:4px; }
+.footer-l { display:flex; align-items:center; gap:10px; }
+.footer-badge { background:var(--blue); border-radius:3px; padding:2px 6px; font-size:9px; font-weight:700; color:#fff; letter-spacing:0.06em; }
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .two-col { grid-template-columns:1fr; }
+  .s4 { grid-template-columns:repeat(2,1fr); }
+  .metrics-bar { grid-template-columns:repeat(3,1fr); }
+  .metrics-bar .m-cell:nth-child(n+4) { display:none; }
+  .header-meta { display:none; }
+  .big-num { font-size:24px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-wordmark">
+    <span class="tmdb-badge">TMDB</span>
+    <span class="header-label">Film Market Analysis</span>
+  </div>
+  <div class="header-body">
+    <div>
+      <div class="header-title">Streaming Content Intelligence</div>
+      <div class="header-sub">Popularity–quality correlation, catalog longevity, release forecasting, and content discovery gaps across 4,682 verified TMDB records.</div>
+      <div class="header-tags">
+        <span class="htag">Python 3</span>
+        <span class="htag">TMDB API</span>
+        <span class="htag htag-m">n = 4,682</span>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div>April 2026</div>
+      <div>Q1 Report</div>
+    </div>
+  </div>
+  <div class="metrics-bar">
+    <div class="m-cell"><div class="m-val">4,682</div><div class="m-lbl">Verified records</div></div>
+    <div class="m-cell"><div class="m-val">15</div><div class="m-lbl">Variables</div></div>
+    <div class="m-cell"><div class="m-val m-val-b">0.079</div><div class="m-lbl">Pearson r</div></div>
+    <div class="m-cell"><div class="m-val m-val-g">62</div><div class="m-lbl">Undervalued titles</div></div>
+    <div class="m-cell"><div class="m-val">192</div><div class="m-lbl">Unreleased tracked</div></div>
+  </div>
+</div>
+
+<!-- ACCORDION NAV -->
+<div class="acc-nav">
+  <span class="nav-label">Sections</span>
+  <button class="acc-btn" onclick="toggle('methodology')">Methodology</button>
+  <button class="acc-btn" onclick="toggle('q1')">I · Popularity vs Quality</button>
+  <button class="acc-btn" onclick="toggle('q2')">II · Catalog Longevity</button>
+  <button class="acc-btn" onclick="toggle('q3')">III · Release Forecasting</button>
+  <button class="acc-btn" onclick="toggle('q4')">IV · Rating Trends</button>
+  <button class="acc-btn" onclick="toggle('q5')">V · Content Discovery</button>
+  <button class="acc-btn" onclick="toggle('appendix')">Appendix</button>
+</div>
+
+<!-- METHODOLOGY -->
+<div class="acc-section" id="methodology">
+  <div class="card">
+    <div class="eyebrow">Data Pipeline</div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num">1</div>
+        <div style="flex:1;">
+          <div class="pipe-title">Extraction — 5,000 records via TMDB API</div>
+          <div class="pipe-detail">Python 3 standard library only (<span class="pill-code">csv</span>, <span class="pill-code">math</span>, <span class="pill-code">statistics</span>). No external dependencies.</div>
+        </div>
+        <span class="badge b-dark" style="flex-shrink:0;margin-top:2px;">Raw</span>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">2</div>
+        <div style="flex:1;">
+          <div class="pipe-title">Deduplication — 304 records removed</div>
+          <div class="pipe-detail">Keyed on <span class="pill-code">(title, release_date)</span> to distinguish same-name films across release years. 384 same-name pairs retained as distinct records.</div>
+        </div>
+        <span class="badge b-warn" style="flex-shrink:0;margin-top:2px;">−304</span>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">3</div>
+        <div style="flex:1;">
+          <div class="pipe-title">Null removal — 14 records dropped</div>
+          <div class="pipe-detail">Records with no parseable release year excluded. Year is a required dimension for sections II, III, and IV.</div>
+        </div>
+        <span class="badge b-warn" style="flex-shrink:0;margin-top:2px;">−14</span>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">4</div>
+        <div style="flex:1;">
+          <div class="pipe-title">Reliability flagging — ~140 records marked low-confidence</div>
+          <div class="pipe-detail">Records with 0 votes or 0 rating assigned <span class="pill-code">is_reliable = False</span>. Retained for section III (expected for unreleased titles); excluded from rating analyses.</div>
+        </div>
+        <span class="badge b-amber" style="flex-shrink:0;margin-top:2px;">Flagged</span>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">5</div>
+        <div style="flex:1;">
+          <div class="pipe-title">Output — 4,682 records × 15 variables</div>
+          <div class="pipe-detail">Exported as <span class="pill-code">tmdb_clean.csv</span>. Ready for downstream visualisation.</div>
+        </div>
+        <span class="badge b-green" style="flex-shrink:0;margin-top:2px;">Clean</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Feature Engineering — 9 derived variables</div>
+    <table class="feat-table">
+      <thead>
+        <tr>
+          <th style="width:155px;">Variable</th>
+          <th style="width:65px;">Type</th>
+          <th>Definition</th>
+          <th style="width:80px;text-align:right;">Section</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>popularity_tier</code></td><td><span class="type-pill">string</span></td>
+          <td>Viral ≥50 · Very High ≥20 · High ≥10 · Medium ≥5 · Low &lt;5 (thresholds from p90/p95)</td>
+          <td style="text-align:right;"><span class="badge b-warn" style="font-size:10px;">I</span> <span class="badge b-dark" style="font-size:10px;">III</span></td>
+        </tr>
+        <tr>
+          <td><code>rating_quality</code></td><td><span class="type-pill">string</span></td>
+          <td>Excellent ≥8 · Good ≥7 · Average ≥6 · Below Average ≥5 · Poor &lt;5 · No Rating</td>
+          <td style="text-align:right;"><span class="badge b-warn" style="font-size:10px;">I</span> <span class="badge b-blue" style="font-size:10px;">V</span></td>
+        </tr>
+        <tr>
+          <td><code>decade</code></td><td><span class="type-pill">string</span></td>
+          <td>Decade grouping derived from release year</td>
+          <td style="text-align:right;"><span class="badge b-green" style="font-size:10px;">II</span> <span class="badge b-amber" style="font-size:10px;">IV</span></td>
+        </tr>
+        <tr>
+          <td><code>is_reliable</code></td><td><span class="type-pill">boolean</span></td>
+          <td>True if vote count ≥ 50</td>
+          <td style="text-align:right;"><span class="badge b-warn" style="font-size:10px;">I</span> <span class="badge b-amber" style="font-size:10px;">IV</span></td>
+        </tr>
+        <tr>
+          <td><code>is_upcoming</code></td><td><span class="type-pill">boolean</span></td>
+          <td>True if release year ≥ 2026</td>
+          <td style="text-align:right;"><span class="badge b-dark" style="font-size:10px;">III</span></td>
+        </tr>
+        <tr>
+          <td><code>is_evergreen</code></td><td><span class="type-pill">boolean</span></td>
+          <td>Pre-2010 release with current popularity &gt; 20</td>
+          <td style="text-align:right;"><span class="badge b-green" style="font-size:10px;">II</span></td>
+        </tr>
+        <tr>
+          <td><code>is_hidden_gem</code></td><td><span class="type-pill">boolean</span></td>
+          <td>Rating ≥ 8.0, votes ≥ 100, popularity &lt; dataset median (5.86)</td>
+          <td style="text-align:right;"><span class="badge b-blue" style="font-size:10px;">V</span></td>
+        </tr>
+        <tr>
+          <td><code>quadrant</code></td><td><span class="type-pill">string</span></td>
+          <td>Viral+Quality / Viral+Poor / Undervalued / Obscure — split by median popularity and rating 7.0</td>
+          <td style="text-align:right;"><span class="badge b-warn" style="font-size:10px;">I</span></td>
+        </tr>
+        <tr>
+          <td><code>pop_vs_rating_corr</code></td><td><span class="type-pill">float</span></td>
+          <td>Pearson r = 0.0792; stored as constant for reference line</td>
+          <td style="text-align:right;"><span class="badge b-warn" style="font-size:10px;">I</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- I. POPULARITY vs QUALITY -->
+<div class="acc-section" id="q1">
+  <div class="card">
+    <div class="finding-hdr">
+      <div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="q-tag">I · Content Strategy</span>
+          <span class="badge b-warn">Platform Acquisition</span>
+        </div>
+        <h2>Popularity does not predict content quality</h2>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="big-num">0.079</div>
+        <div class="big-lbl">Pearson r (n = 3,981)</div>
+      </div>
+    </div>
+    <p class="body-text" style="margin-bottom:14px;">Across 3,981 records with ≥ 50 votes, the correlation between TMDB popularity score and audience rating is r = 0.079. Popularity explains under 1% of rating variance. Trending position and content satisfaction operate as independent variables.</p>
+    <div class="stat-grid s4">
+      <div class="stat-box">
+        <div class="val" style="color:var(--dark);">1,037</div>
+        <div class="lbl">Viral + Quality</div>
+        <div class="sub">High popularity · rating ≥ 7.0</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" style="color:var(--warn);">954</div>
+        <div class="lbl">Viral + Poor</div>
+        <div class="sub">High popularity · rating &lt; 7.0</div>
+      </div>
+      <div class="stat-box">
+        <div class="val" style="color:var(--blue);">718</div>
+        <div class="lbl">Undervalued</div>
+        <div class="sub">Low popularity · rating ≥ 7.0</div>
+      </div>
+      <div class="stat-box">
+        <div class="val">1,272</div>
+        <div class="lbl">Obscure</div>
+        <div class="sub">Low popularity · rating &lt; 7.0</div>
+      </div>
+    </div>
+    <div class="rec">
+      <div class="rec-lbl">Implication</div>
+      <div class="rec-text">Acquisition frameworks that weight trending rank over audience satisfaction will systematically over-invest in content that does not retain subscribers. A quality-signal layer decoupled from the trending algorithm is necessary for sound library decisions.</div>
+    </div>
+  </div>
+</div>
+
+<!-- II. CATALOG LONGEVITY -->
+<div class="acc-section" id="q2">
+  <div class="card">
+    <div class="finding-hdr">
+      <div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="q-tag">II · Library Acquisition</span>
+          <span class="badge b-green">Catalog Strategy</span>
+        </div>
+        <h2>1990s–2000s catalog retains competitive audience reach</h2>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="big-num" style="color:var(--dark);">86</div>
+        <div class="big-lbl">pre-2010 titles · popularity &gt; 20</div>
+      </div>
+    </div>
+    <p class="body-text" style="margin-bottom:14px;">86 pre-2010 titles maintain a current popularity score above 20, competing directly with new releases. Titles with ratings ≥ 8.0 show the strongest sustained reach. Evergreen engagement is concentrated in the 1990s and 2000s; pre-1980 titles show minimal modern traction.</p>
+    <div style="margin-bottom:12px;">
+      <div class="bar-row"><span class="bar-lbl">1990s</span><div class="bar-wrap"><div class="bar-fill" style="width:90%"></div></div><span class="bar-val">Strongest</span></div>
+      <div class="bar-row"><span class="bar-lbl">2000s</span><div class="bar-wrap"><div class="bar-fill" style="width:70%"></div></div><span class="bar-val">Strong</span></div>
+      <div class="bar-row"><span class="bar-lbl">1980s</span><div class="bar-wrap"><div class="bar-fill" style="width:44%"></div></div><span class="bar-val">Moderate</span></div>
+      <div class="bar-row"><span class="bar-lbl">1970s</span><div class="bar-wrap"><div class="bar-fill" style="width:20%"></div></div><span class="bar-val" style="color:var(--t3);">Low</span></div>
+      <div class="bar-row"><span class="bar-lbl">Pre-1970</span><div class="bar-wrap"><div class="bar-fill" style="width:7%"></div></div><span class="bar-val" style="color:var(--t3);">Minimal</span></div>
+    </div>
+    <div class="rec">
+      <div class="rec-lbl">Implication</div>
+      <div class="rec-text">Catalog titles from the 1990s–2000s with ratings above 7.5 demonstrate sustained audience engagement 20+ years post-release. Premium licensing investment in this cohort is justified for platforms with long-term retention objectives.</div>
+    </div>
+  </div>
+</div>
+
+<!-- III. RELEASE FORECASTING -->
+<div class="acc-section" id="q3">
+  <div class="card">
+    <div class="finding-hdr">
+      <div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="q-tag">III · Release Forecasting</span>
+          <span class="badge b-dark">Pre-release Signal</span>
+        </div>
+        <h2>192 unreleased titles are generating measurable pre-release demand</h2>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="big-num">192</div>
+        <div class="big-lbl">unreleased titles in TMDB trending</div>
+      </div>
+    </div>
+    <p class="body-text" style="margin-bottom:14px;">192 titles with release years of 2026 or later already appear in TMDB trending data. A popularity score above 200 is identified as a blockbuster-level signal. Top five titles by current pre-release popularity:</p>
+    <div style="margin-bottom:12px;">
+      <div class="buzz-row"><span class="buzz-rank">#1</span><span class="buzz-title">Your Heart Will Be Broken<span class="buzz-year">2026</span></span><span class="buzz-score">1,340.9</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#2</span><span class="buzz-title">Avatar: Fire and Ash<span class="buzz-year">2025</span></span><span class="buzz-score">397.8</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#3</span><span class="buzz-title">Project Hail Mary<span class="buzz-year">2026</span></span><span class="buzz-score">314.9</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#4</span><span class="buzz-title">Scream 7<span class="buzz-year">2026</span></span><span class="buzz-score">245.2</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#5</span><span class="buzz-title">Peaky Blinders: The Immortal Man<span class="buzz-year">2026</span></span><span class="buzz-score">230.4</span></div>
+    </div>
+    <div class="rec">
+      <div class="rec-lbl">Implication</div>
+      <div class="rec-text">Titles crossing a pre-release popularity threshold of 200 are generating organic audience demand ahead of any formal campaign. This signal can be used to prioritise marketing allocation and inform acquisition discussions before release-window competition intensifies.</div>
+    </div>
+  </div>
+</div>
+
+<!-- IV. RATING TRENDS -->
+<div class="acc-section" id="q4">
+  <div class="card">
+    <div class="finding-hdr">
+      <div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="q-tag">IV · Audience Insight</span>
+          <span class="badge b-amber">Declining Satisfaction</span>
+        </div>
+        <h2>Audience ratings have declined 0.50 points since 2020 despite a 10× rise in popularity</h2>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="big-num" style="color:var(--warn);">10×</div>
+        <div class="big-lbl">popularity growth · 2021–2026</div>
+      </div>
+    </div>
+    <p class="body-text" style="margin-bottom:14px;">Average ratings peaked at 7.16 in 2020 and have declined to 6.66 in 2026. Over the same period, average popularity increased approximately tenfold. Discovery volume is rising while per-title satisfaction is falling.</p>
+    <div style="margin-bottom:6px;">
+      <div class="trend-row"><span class="trend-yr">2018</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:72%;background:rgba(1,180,228,0.45);"></div></div><span class="trend-val">6.86</span></div>
+      <div class="trend-row"><span class="trend-yr">2019</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:78%;background:rgba(1,180,228,0.45);"></div></div><span class="trend-val">6.99</span></div>
+      <div class="trend-row"><span class="trend-yr">2020</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:90%;background:var(--green);"></div></div><span class="trend-val" style="color:var(--green);">7.16 ▲</span></div>
+      <div class="trend-row"><span class="trend-yr">2021</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:82%;background:rgba(1,180,228,0.45);"></div></div><span class="trend-val">7.00</span></div>
+      <div class="trend-row"><span class="trend-yr">2022</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:84%;background:rgba(1,180,228,0.45);"></div></div><span class="trend-val">7.08</span></div>
+      <div class="trend-row"><span class="trend-yr">2023</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:80%;background:rgba(1,180,228,0.45);"></div></div><span class="trend-val">7.03</span></div>
+      <div class="trend-row"><span class="trend-yr">2024</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:64%;background:#E8846A;"></div></div><span class="trend-val" style="color:var(--warn);">6.74 ▼</span></div>
+      <div class="trend-row"><span class="trend-yr">2025</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:60%;background:#E8846A;"></div></div><span class="trend-val" style="color:var(--warn);">6.67 ▼</span></div>
+      <div class="trend-row"><span class="trend-yr">2026*</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:58%;background:#E8846A;"></div></div><span class="trend-val" style="color:var(--warn);">6.66 ▼</span></div>
+    </div>
+    <p style="font-size:11px;color:var(--t3);margin-bottom:12px;">*Partial year (n = 56). Records with votes ≥ 50 only.</p>
+    <div class="rec">
+      <div class="rec-lbl">Implication</div>
+      <div class="rec-text">Volume growth in content discovery is not translating to audience satisfaction. The 2020–2022 rating peak coincided with reduced output during production slowdowns; the subsequent volume increase correlates with declining satisfaction scores. Quality-per-title metrics warrant attention as a complement to volume-based acquisition targets.</div>
+    </div>
+  </div>
+</div>
+
+<!-- V. CONTENT DISCOVERY -->
+<div class="acc-section" id="q5">
+  <div class="card">
+    <div class="finding-hdr">
+      <div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+          <span class="q-tag">V · Content Discovery</span>
+          <span class="badge b-blue">Subscriber Retention</span>
+        </div>
+        <h2>62 high-rated titles remain below median visibility</h2>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div class="big-num" style="color:var(--blue);">62</div>
+        <div class="big-lbl">rating ≥ 8.0 · popularity &lt; median</div>
+      </div>
+    </div>
+    <p class="body-text" style="margin-bottom:14px;">62 titles meet all three criteria: rating ≥ 8.0, vote count ≥ 100, and current popularity below the dataset median of 5.86. These titles carry verified audience approval but have not achieved proportionate discovery. Top titles by rating:</p>
+    <table class="gem-table" style="margin-bottom:6px;">
+      <thead><tr><th>Title</th><th>Rating</th><th>Popularity</th></tr></thead>
+      <tbody>
+        <tr><td><span class="gem-title">Seven Samurai</span><span class="gem-year">1954</span></td><td class="gem-rating">8.45</td><td class="gem-pop">16.90</td></tr>
+        <tr><td><span class="gem-title">Life is Beautiful</span><span class="gem-year">1997</span></td><td class="gem-rating">8.44</td><td class="gem-pop">13.80</td></tr>
+        <tr><td><span class="gem-title">City of God</span><span class="gem-year">2002</span></td><td class="gem-rating">8.43</td><td class="gem-pop">14.10</td></tr>
+        <tr><td><span class="gem-title">Paths of Glory</span><span class="gem-year">1957</span></td><td class="gem-rating">8.25</td><td class="gem-pop">5.79</td></tr>
+        <tr><td><span class="gem-title">The Legend of 1900</span><span class="gem-year">1998</span></td><td class="gem-rating">8.24</td><td class="gem-pop">5.79</td></tr>
+        <tr><td><span class="gem-title">Togo</span><span class="gem-year">2019</span></td><td class="gem-rating">8.13</td><td class="gem-pop">5.77</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:var(--t3);margin-bottom:12px;">Top 6 of 62. Full list available in the dashboard.</p>
+    <div class="rec">
+      <div class="rec-lbl">Implication</div>
+      <div class="rec-text">A discovery shelf surfacing titles with ratings above 8.0 and below-median popularity is a low-cost retention mechanism. Content with verified quality scores and suppressed visibility requires no additional licensing premium — the investment is in surface placement, not acquisition. Particularly viable for platforms competing against blockbuster-weighted catalogues.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APPENDIX -->
+<div class="acc-section" id="appendix">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:1rem;">
+      <div>
+        <div class="eyebrow">Output Schema</div>
+        <h2 style="margin-top:4px;">tmdb_clean.csv</h2>
+        <p class="body-text" style="margin-top:4px;font-size:13px;">4,682 records × 15 variables.</p>
+      </div>
+      <div class="mc-row">
+        <div class="mc"><div class="v">4,682</div><div class="l">Records</div></div>
+        <div class="mc"><div class="v">15</div><div class="l">Variables</div></div>
+        <div class="mc"><div class="v">9</div><div class="l">Derived</div></div>
+      </div>
+    </div>
+    <table class="schema-table">
+      <thead>
+        <tr><th style="width:155px;">Variable</th><th style="width:65px;">Type</th><th>Description</th><th style="width:75px;text-align:right;">Origin</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>title</code></td><td><span class="type-pill">string</span></td><td>Film title</td><td style="text-align:right;font-size:11px;color:var(--t3);">Raw</td></tr>
+        <tr><td><code>release_date</code></td><td><span class="type-pill">string</span></td><td>Release date (YYYY-MM-DD)</td><td style="text-align:right;font-size:11px;color:var(--t3);">Raw</td></tr>
+        <tr><td><code>year</code></td><td><span class="type-pill">int</span></td><td>Release year</td><td style="text-align:right;font-size:11px;color:var(--t3);">Raw</td></tr>
+        <tr><td><code>popularity</code></td><td><span class="type-pill">float</span></td><td>TMDB popularity score</td><td style="text-align:right;font-size:11px;color:var(--t3);">Raw</td></tr>
+        <tr><td><code>rating</code></td><td><span class="type-pill">float</span></td><td>Audience rating (0–10)</td><td style="text-align:right;font-size:11px;color:var(--t3);">Raw</td></tr>
+        <tr><td><code>votes</code></td><td><span class="type-pill">int</span></td><td>Vote count</td><td style="text-align:right;font-size:11px;color:var(--t3);">Raw</td></tr>
+        <tr><td><code>decade</code></td><td><span class="type-pill">string</span></td><td>Decade label</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>popularity_tier</code></td><td><span class="type-pill">string</span></td><td>Viral / Very High / High / Medium / Low</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>rating_quality</code></td><td><span class="type-pill">string</span></td><td>Excellent / Good / Average / Below Average / Poor / No Rating</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>is_reliable</code></td><td><span class="type-pill">boolean</span></td><td>True if votes ≥ 50</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>is_upcoming</code></td><td><span class="type-pill">boolean</span></td><td>True if year ≥ 2026</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>is_evergreen</code></td><td><span class="type-pill">boolean</span></td><td>Pre-2010 AND popularity &gt; 20</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>is_hidden_gem</code></td><td><span class="type-pill">boolean</span></td><td>Rating ≥ 8.0, votes ≥ 100, popularity &lt; median</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>quadrant</code></td><td><span class="type-pill">string</span></td><td>Viral+Quality / Viral+Poor / Undervalued / Obscure</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+        <tr><td><code>pop_vs_rating_corr</code></td><td><span class="type-pill">float</span></td><td>Pearson r = 0.0792 (stored as constant)</td><td style="text-align:right;font-size:10px;"><span class="eng-dot"></span>Derived</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Reproduction</div>
+    <p class="body-text" style="margin-top:6px;">No external dependencies. Executes on any Python 3.x environment.</p>
+    <div class="code-block">
+      <div class="cc"># run cleaning script</div>
+      <div><span class="ck">python3</span> clean_tmdb.py</div>
+      <div style="margin-top:8px;" class="cc"># output</div>
+      <div><span class="ca">→</span> <span class="co">tmdb_clean.csv</span> <span class="cc">(4,682 × 15)</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-l">
+    <span class="footer-badge">TMDB</span>
+    <span>Streaming Content Intelligence · Q1 2026</span>
+  </div>
+  <span style="color:rgba(144,206,161,0.7);">Source: TMDB API · Python 3</span>
+</div>
+
+</div>
+
+<script>
+function toggle(id) {
+  const section = document.getElementById(id);
+  const btn = document.querySelector('[onclick="toggle(\'' + id + '\')"]');
+  const isOpen = section.classList.contains('open');
+  document.querySelectorAll('.acc-section').forEach(s => s.classList.remove('open'));
+  document.querySelectorAll('.acc-btn').forEach(b => b.classList.remove('active'));
+  if (!isOpen) {
+    section.classList.add('open');
+    btn.classList.add('active');
+    section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+</script>
+</body>
+</html>
