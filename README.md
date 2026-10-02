@@ -1,4 +1,6 @@
-# Minh Tan Nguyen — Data Analytics Portfolio
+# TMDB Movie Insights
+
+By Minh Tan Nguyen. An end-to-end analysis of 4,682 TMDB films: Python ETL, five streaming-industry business questions, and a Power BI catalogue dashboard.
 
 AI & Business Analytics student at the University of South Florida. I use data to uncover trends, automate workflows, and tell stories that drive business decisions.
 
@@ -29,11 +31,11 @@ AI & Business Analytics student at the University of South Florida. I use data t
 
 **Key finding:** Popularity and audience rating are only weakly related: Pearson **r = 0.079**, Spearman rank **ρ = 0.230** (3,981 films with ≥ 50 votes). Trending content does not reliably satisfy audiences.
 
-**[View Full Report →](https://m1nhn9.github.io/data-analytics-portfolio/project-1-tmdb-analysis/Entertainment_Industry_Data_Analysis_Portfolio.html)**
+**[View Full Report →](https://m1nhn9.github.io/tmdb-movie-insights/project-1-tmdb-analysis/Entertainment_Industry_Data_Analysis_Portfolio.html)**
 
 | File | Description |
 |---|---|
-| [`Entertainment_Industry_Data_Analysis_Portfolio.html`](https://m1nhn9.github.io/data-analytics-portfolio/project-1-tmdb-analysis/Entertainment_Industry_Data_Analysis_Portfolio.html) | Full visual analysis report |
+| [`Entertainment_Industry_Data_Analysis_Portfolio.html`](https://m1nhn9.github.io/tmdb-movie-insights/project-1-tmdb-analysis/Entertainment_Industry_Data_Analysis_Portfolio.html) | Full visual analysis report |
 | [`fetch_tmdb.py`](./project-1-tmdb-analysis/fetch_tmdb.py) | Extraction script: pulls the popular-movies list from the TMDB API (needs a `TMDB_API_KEY` environment variable). *Reconstructed in October 2026*: the original April 2026 extraction script was never committed, so running this pulls today's list, not the April snapshot. |
 | [`clean_tmdb.py`](./project-1-tmdb-analysis/clean_tmdb.py) | Data cleaning + feature engineering script |
 | [`tmdb_popular_movies.csv`](./project-1-tmdb-analysis/tmdb_popular_movies.csv) | Raw dataset (5,000 rows) |
@@ -46,6 +48,3 @@ AI & Business Analytics student at the University of South Florida. I use data t
 
 KPI header with filters, then releases and ratings by year, popularity vs rating, catalogue mix, a top 10 trending list, an upcoming releases watchlist and a hidden-gem shortlist. See [`powerbi/README.md`](./project-1-tmdb-analysis/powerbi/README.md) for how to open it.
 
----
-
-*More projects coming soon.*
