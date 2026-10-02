@@ -369,6 +369,7 @@
     <div class="hero-stat"><div class="num">4,682</div><div class="lbl">Clean Rows</div></div>
     <div class="hero-stat"><div class="num">15</div><div class="lbl">Columns</div></div>
     <div class="hero-stat"><div class="num">0.079</div><div class="lbl">Pearson r (pop vs rating)</div></div>
+    <div class="hero-stat"><div class="num">0.230</div><div class="lbl">Spearman ρ (pop vs rating)</div></div>
     <div class="hero-stat"><div class="num">62</div><div class="lbl">Hidden Gems Found</div></div>
   </div>
 </div>
@@ -382,7 +383,6 @@
   <div class="tools-row">
     <div class="tool-chip"><div class="tool-dot" style="background:#3ecfb2"></div>Python 3 (stdlib only)</div>
     <div class="tool-chip"><div class="tool-dot" style="background:#7c6af7"></div>csv · math · statistics</div>
-    <div class="tool-chip"><div class="tool-dot" style="background:#f5a623"></div>Tableau (dashboard)</div>
     <div class="tool-chip"><div class="tool-dot" style="background:#5bb8f5"></div>TMDB API (source data)</div>
   </div>
 </section>
@@ -447,14 +447,14 @@
           <td style="color:var(--muted);font-size:12px;">Required for Q2, Q3, Q4 — rows with no year are unusable</td>
         </tr>
         <tr>
-          <td>Zero-vote / zero-rating rows</td>
-          <td><span style="font-weight:600;color:var(--accent3);">~140</span></td>
+          <td>Low-vote rows (votes &lt; 50)</td>
+          <td><span style="font-weight:600;color:var(--accent3);">701</span></td>
           <td><span class="badge badge-flagged">Flagged</span></td>
-          <td style="color:var(--muted);font-size:12px;">Kept for upcoming films (expected); marked <span class="mono">is_reliable = False</span></td>
+          <td style="color:var(--muted);font-size:12px;">Kept for upcoming films (expected); marked <span class="mono">is_reliable = False</span>. Includes 125 with no votes or rating</td>
         </tr>
         <tr>
           <td>Same-name films (different years)</td>
-          <td><span style="font-weight:600;color:var(--accent2);">384 titles</span></td>
+          <td><span style="font-weight:600;color:var(--accent2);">97 titles</span></td>
           <td><span class="badge badge-kept">Kept</span></td>
           <td style="color:var(--muted);font-size:12px;">e.g. <em>War of the Worlds</em> (2005) and <em>War of the Worlds</em> (2025) are distinct</td>
         </tr>
@@ -479,7 +479,7 @@
       <div class="metric-icon">✅</div>
       <div class="metric-val teal">4,682</div>
       <div class="metric-label">Clean rows exported</div>
-      <div class="metric-sub">Ready for Tableau</div>
+      <div class="metric-sub">Ready for analysis</div>
     </div>
   </div>
 </section>
@@ -488,7 +488,7 @@
 <section>
   <div class="section-label">Feature Engineering</div>
   <div class="section-title">Calculated Columns</div>
-  <div class="section-desc">9 new columns derived to power each business question directly in Tableau.</div>
+  <div class="section-desc">9 new columns derived to power each business question directly.</div>
 
   <div class="table-wrap">
     <table>
@@ -547,7 +547,7 @@
         <tr>
           <td><span class="col-name">pop_vs_rating_corr</span></td>
           <td><span class="schema-type">float</span></td>
-          <td style="font-size:12px;color:var(--muted);">Pearson r = 0.0792 — stored as constant for Tableau reference line</td>
+          <td style="font-size:12px;color:var(--muted);">Pearson r = 0.0792 — stored as constant for a chart reference line</td>
           <td style="font-size:12px;">Q1</td>
         </tr>
       </tbody>
@@ -574,9 +574,10 @@
 
     <div class="corr-callout">
       <div class="corr-r">r = 0.079</div>
+      <div class="corr-r">ρ = 0.230</div>
       <div class="corr-text">
-        <h3>Near-zero correlation</h3>
-        <p>Calculated via Pearson on <strong>3,981 reliable films</strong> (votes ≥ 50). Trending and quality are essentially independent variables — viral content does not reliably satisfy audiences.</p>
+        <h3>Weak correlation</h3>
+        <p>Pearson r and Spearman rank ρ on <strong>3,981 reliable films</strong> (votes ≥ 50). Popularity is heavily skewed, so the rank-based Spearman is the fairer measure: it shows a weak positive link. Either way, viral content does not reliably satisfy audiences.</p>
       </div>
     </div>
 
@@ -621,34 +622,34 @@
     </div>
 
     <div class="finding-box" style="margin-bottom:16px;">
-      <strong>86 pre-2010 films</strong> still have a popularity score above 20 today — competing with recent releases decades later. High-rated classics (rating ≥ 8) show the strongest retention.
+      <strong>86 pre-2010 films</strong> still have a popularity score above 20 today — competing with recent releases decades later. High-rated classics (rating ≥ 8) show the strongest retention. Most are from the 2000s and 1990s, but 22 pre-date 1980.
     </div>
 
     <div style="margin-bottom:16px;">
       <div class="bar-row">
-        <div class="bar-lbl">1990s</div>
-        <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--accent2);"></div></div>
-        <div class="bar-count" style="color:var(--accent2);">Strongest</div>
-      </div>
-      <div class="bar-row">
         <div class="bar-lbl">2000s</div>
-        <div class="bar-track"><div class="bar-fill" style="width:55%;background:var(--accent2);opacity:.8"></div></div>
-        <div class="bar-count" style="color:var(--muted);">Strong</div>
+        <div class="bar-track"><div class="bar-fill" style="width:68%;background:var(--accent2);"></div></div>
+        <div class="bar-count" style="color:var(--accent2);">31 titles</div>
       </div>
       <div class="bar-row">
-        <div class="bar-lbl">1980s</div>
-        <div class="bar-track"><div class="bar-fill" style="width:34%;background:var(--accent2);opacity:.6"></div></div>
-        <div class="bar-count" style="color:var(--muted);">Moderate</div>
-      </div>
-      <div class="bar-row">
-        <div class="bar-lbl">1970s</div>
-        <div class="bar-track"><div class="bar-fill" style="width:18%;background:var(--accent2);opacity:.4"></div></div>
-        <div class="bar-count" style="color:var(--muted);">Low</div>
+        <div class="bar-lbl">1990s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:53%;background:var(--accent2);opacity:.8"></div></div>
+        <div class="bar-count" style="color:var(--muted);">24 titles</div>
       </div>
       <div class="bar-row">
         <div class="bar-lbl">Pre-1970</div>
-        <div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--accent2);opacity:.3"></div></div>
-        <div class="bar-count" style="color:var(--muted);">Minimal</div>
+        <div class="bar-track"><div class="bar-fill" style="width:33%;background:var(--accent2);opacity:.6"></div></div>
+        <div class="bar-count" style="color:var(--muted);">15 titles</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-lbl">1980s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:20%;background:var(--accent2);opacity:.4"></div></div>
+        <div class="bar-count" style="color:var(--muted);">9 titles</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-lbl">1970s</div>
+        <div class="bar-track"><div class="bar-fill" style="width:15%;background:var(--accent2);opacity:.3"></div></div>
+        <div class="bar-count" style="color:var(--muted);">7 titles</div>
       </div>
     </div>
 
@@ -683,31 +684,31 @@
       </div>
       <div class="rank-row">
         <div class="rank-num">#2</div>
-        <div class="rank-title">Avatar: Fire and Ash</div>
-        <div class="rank-year">2025</div>
-        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:30%"></div></div></div>
-        <div class="rank-pop">397.8</div>
+        <div class="rank-title">Mike &amp; Nick &amp; Nick &amp; Alice</div>
+        <div class="rank-year">2026</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:29%"></div></div></div>
+        <div class="rank-pop">382.9</div>
       </div>
       <div class="rank-row">
         <div class="rank-num">#3</div>
-        <div class="rank-title">Project Hail Mary</div>
+        <div class="rank-title">Pretty Lethal</div>
         <div class="rank-year">2026</div>
-        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:23%"></div></div></div>
-        <div class="rank-pop">314.9</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:26%"></div></div></div>
+        <div class="rank-pop">343.0</div>
       </div>
       <div class="rank-row">
         <div class="rank-num">#4</div>
-        <div class="rank-title">Scream 7</div>
+        <div class="rank-title">Shelter</div>
         <div class="rank-year">2026</div>
-        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:18%"></div></div></div>
-        <div class="rank-pop">245.2</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:24%"></div></div></div>
+        <div class="rank-pop">321.9</div>
       </div>
       <div class="rank-row">
         <div class="rank-num">#5</div>
-        <div class="rank-title">Peaky Blinders: The Immortal Man</div>
+        <div class="rank-title">Project Hail Mary</div>
         <div class="rank-year">2026</div>
-        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:17%"></div></div></div>
-        <div class="rank-pop">230.4</div>
+        <div class="pop-bar-wrap"><div class="pop-bar-bg"><div class="pop-bar-fg" style="width:23%"></div></div></div>
+        <div class="rank-pop">315.0</div>
       </div>
     </div>
 
@@ -729,7 +730,7 @@
     </div>
 
     <div class="finding-box" style="margin-bottom:20px;">
-      Ratings <strong>peaked 2020–2022</strong> (~7.0+) and have declined since. Average popularity in 2026 is <strong>10× higher</strong> than 2023 — more buzz, lower satisfaction.
+      Average ratings <strong>peaked 2020–2022</strong> (~7.0+) and are lower for recent releases, but this is not evidence that audiences rate more harshly. Recent films have far fewer votes (<strong>median 3,116</strong> for 2018 releases vs <strong>115</strong> for 2026), and older films only stay in a current popularity list if people still watch them (<strong>survivorship</strong>).
     </div>
 
     <!-- Rating bars -->
@@ -749,7 +750,7 @@
 
     <div class="rec-box pink">
       <div class="rec-label">Business Recommendation</div>
-      Despite a 10× surge in content popularity since 2021, average audience ratings have declined — suggesting the industry is producing more discoverable but less satisfying content. Platforms should recalibrate toward quality signals over volume.
+      Treat the decline as a hypothesis to test, not a finding. Compare films at the same age (for example, ratings one year after release) using a full release-year sample before drawing conclusions about audience satisfaction.
     </div>
   </div>
 
@@ -775,12 +776,12 @@
         <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:right;">Rating</div>
         <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:right;">Popularity</div>
       </div>
-      <div class="gem-row"><div class="gem-title">Seven Samurai</div><div class="gem-year">1954</div><div class="gem-rating">8.45</div><div class="gem-pop">16.90</div></div>
-      <div class="gem-row"><div class="gem-title">Life is Beautiful</div><div class="gem-year">1997</div><div class="gem-rating">8.44</div><div class="gem-pop">13.80</div></div>
-      <div class="gem-row"><div class="gem-title">City of God</div><div class="gem-year">2002</div><div class="gem-rating">8.43</div><div class="gem-pop">14.10</div></div>
-      <div class="gem-row"><div class="gem-title">Paths of Glory</div><div class="gem-year">1957</div><div class="gem-rating">8.25</div><div class="gem-pop">5.79</div></div>
-      <div class="gem-row"><div class="gem-title">The Legend of 1900</div><div class="gem-year">1998</div><div class="gem-rating">8.24</div><div class="gem-pop">5.79</div></div>
-      <div class="gem-row"><div class="gem-title">Togo</div><div class="gem-year">2019</div><div class="gem-rating">8.13</div><div class="gem-pop">5.77</div></div>
+      <div class="gem-row"><div class="gem-title">Nude</div><div class="gem-year">2017</div><div class="gem-rating">9.40</div><div class="gem-pop">4.32</div></div>
+      <div class="gem-row"><div class="gem-title">A Dog's Will</div><div class="gem-year">2000</div><div class="gem-rating">8.42</div><div class="gem-pop">5.04</div></div>
+      <div class="gem-row"><div class="gem-title">Gabriel's Inferno: Part III</div><div class="gem-year">2020</div><div class="gem-rating">8.40</div><div class="gem-pop">4.79</div></div>
+      <div class="gem-row"><div class="gem-title">David Attenborough: A Life on Our Planet</div><div class="gem-year">2020</div><div class="gem-rating">8.40</div><div class="gem-pop">4.80</div></div>
+      <div class="gem-row"><div class="gem-title">Impossible Things</div><div class="gem-year">2021</div><div class="gem-rating">8.40</div><div class="gem-pop">4.49</div></div>
+      <div class="gem-row"><div class="gem-title">Gabriel's Inferno</div><div class="gem-year">2020</div><div class="gem-rating">8.39</div><div class="gem-pop">4.51</div></div>
     </div>
 
     <div class="rec-box blue">
@@ -794,7 +795,7 @@
 <section>
   <div class="section-label">Output</div>
   <div class="section-title">Clean Dataset Schema</div>
-  <div class="section-desc"><span class="mono">tmdb_clean.csv</span> — 4,682 rows × 15 columns, ready to connect directly to Tableau.</div>
+  <div class="section-desc"><span class="mono">tmdb_clean.csv</span> — 4,682 rows × 15 columns, ready for any BI or charting tool.</div>
 
   <div class="card-grid card-grid-4" style="margin-bottom:24px;">
     <div class="metric-card mc-teal">
@@ -857,7 +858,7 @@
 </div><!-- /container -->
 
 <footer>
-  TMDB Movie Data Analysis &nbsp;·&nbsp; Built with Python &amp; Tableau &nbsp;·&nbsp;
+  TMDB Movie Data Analysis &nbsp;·&nbsp; Built with Python &nbsp;·&nbsp;
   Data sourced from <a href="#">TMDB API</a>
 </footer>
 

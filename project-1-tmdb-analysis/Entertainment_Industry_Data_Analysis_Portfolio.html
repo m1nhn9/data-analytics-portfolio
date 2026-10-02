@@ -225,7 +225,7 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
   <div class="metrics-bar">
     <div class="m-cell"><div class="m-val">4,682</div><div class="m-lbl">Verified records</div></div>
     <div class="m-cell"><div class="m-val">15</div><div class="m-lbl">Variables</div></div>
-    <div class="m-cell"><div class="m-val m-val-b">0.079</div><div class="m-lbl">Pearson r</div></div>
+    <div class="m-cell"><div class="m-val m-val-b">0.079 · 0.230</div><div class="m-lbl">Pearson r · Spearman ρ</div></div>
     <div class="m-cell"><div class="m-val m-val-g">62</div><div class="m-lbl">Undervalued titles</div></div>
     <div class="m-cell"><div class="m-val">192</div><div class="m-lbl">Unreleased tracked</div></div>
   </div>
@@ -260,7 +260,7 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
         <div class="pipe-num">2</div>
         <div style="flex:1;">
           <div class="pipe-title">Deduplication — 304 records removed</div>
-          <div class="pipe-detail">Keyed on <span class="pill-code">(title, release_date)</span> to distinguish same-name films across release years. 384 same-name pairs retained as distinct records.</div>
+          <div class="pipe-detail">Keyed on <span class="pill-code">(title, release_date)</span> to distinguish same-name films across release years. 97 titles shared by more than one film (203 records) retained as distinct records.</div>
         </div>
         <span class="badge b-warn" style="flex-shrink:0;margin-top:2px;">−304</span>
       </div>
@@ -275,8 +275,8 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
       <div class="pipe-step">
         <div class="pipe-num">4</div>
         <div style="flex:1;">
-          <div class="pipe-title">Reliability flagging — ~140 records marked low-confidence</div>
-          <div class="pipe-detail">Records with 0 votes or 0 rating assigned <span class="pill-code">is_reliable = False</span>. Retained for section III (expected for unreleased titles); excluded from rating analyses.</div>
+          <div class="pipe-title">Reliability flagging — 701 records marked low-confidence</div>
+          <div class="pipe-detail">Records with fewer than 50 votes assigned <span class="pill-code">is_reliable = False</span> (125 of them have no votes or rating at all). Retained for section III (expected for unreleased titles); excluded from rating analyses.</div>
         </div>
         <span class="badge b-amber" style="flex-shrink:0;margin-top:2px;">Flagged</span>
       </div>
@@ -362,14 +362,15 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
           <span class="q-tag">I · Content Strategy</span>
           <span class="badge b-warn">Platform Acquisition</span>
         </div>
-        <h2>Popularity does not predict content quality</h2>
+        <h2>Popularity is a weak predictor of content quality</h2>
       </div>
       <div style="text-align:right;flex-shrink:0;">
         <div class="big-num">0.079</div>
         <div class="big-lbl">Pearson r (n = 3,981)</div>
+        <div class="big-lbl">Spearman ρ = 0.230</div>
       </div>
     </div>
-    <p class="body-text" style="margin-bottom:14px;">Across 3,981 records with ≥ 50 votes, the correlation between TMDB popularity score and audience rating is r = 0.079. Popularity explains under 1% of rating variance. Trending position and content satisfaction operate as independent variables.</p>
+    <p class="body-text" style="margin-bottom:14px;">Across 3,981 records with ≥ 50 votes, the correlation between TMDB popularity score and audience rating is r = 0.079. Popularity explains under 1% of rating variance. Because popularity is heavily skewed (a few titles score in the hundreds), the rank-based Spearman correlation is also reported: ρ = 0.230, a weak positive relationship. On either measure, trending position is a poor guide to audience satisfaction.</p>
     <div class="stat-grid s4">
       <div class="stat-box">
         <div class="val" style="color:var(--dark);">1,037</div>
@@ -415,13 +416,13 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
         <div class="big-lbl">pre-2010 titles · popularity &gt; 20</div>
       </div>
     </div>
-    <p class="body-text" style="margin-bottom:14px;">86 pre-2010 titles maintain a current popularity score above 20, competing directly with new releases. Titles with ratings ≥ 8.0 show the strongest sustained reach. Evergreen engagement is concentrated in the 1990s and 2000s; pre-1980 titles show minimal modern traction.</p>
+    <p class="body-text" style="margin-bottom:14px;">86 pre-2010 titles maintain a current popularity score above 20, competing directly with new releases. Titles with ratings ≥ 8.0 show the strongest sustained reach. Evergreen titles are concentrated in the 2000s (31) and 1990s (24), but 22 pre-date 1980, so older catalog is not negligible. Counts by decade:</p>
     <div style="margin-bottom:12px;">
-      <div class="bar-row"><span class="bar-lbl">1990s</span><div class="bar-wrap"><div class="bar-fill" style="width:90%"></div></div><span class="bar-val">Strongest</span></div>
-      <div class="bar-row"><span class="bar-lbl">2000s</span><div class="bar-wrap"><div class="bar-fill" style="width:70%"></div></div><span class="bar-val">Strong</span></div>
-      <div class="bar-row"><span class="bar-lbl">1980s</span><div class="bar-wrap"><div class="bar-fill" style="width:44%"></div></div><span class="bar-val">Moderate</span></div>
-      <div class="bar-row"><span class="bar-lbl">1970s</span><div class="bar-wrap"><div class="bar-fill" style="width:20%"></div></div><span class="bar-val" style="color:var(--t3);">Low</span></div>
-      <div class="bar-row"><span class="bar-lbl">Pre-1970</span><div class="bar-wrap"><div class="bar-fill" style="width:7%"></div></div><span class="bar-val" style="color:var(--t3);">Minimal</span></div>
+      <div class="bar-row"><span class="bar-lbl">2000s</span><div class="bar-wrap"><div class="bar-fill" style="width:90%"></div></div><span class="bar-val">31 titles</span></div>
+      <div class="bar-row"><span class="bar-lbl">1990s</span><div class="bar-wrap"><div class="bar-fill" style="width:70%"></div></div><span class="bar-val">24 titles</span></div>
+      <div class="bar-row"><span class="bar-lbl">Pre-1970</span><div class="bar-wrap"><div class="bar-fill" style="width:44%"></div></div><span class="bar-val">15 titles</span></div>
+      <div class="bar-row"><span class="bar-lbl">1980s</span><div class="bar-wrap"><div class="bar-fill" style="width:26%"></div></div><span class="bar-val" style="color:var(--t3);">9 titles</span></div>
+      <div class="bar-row"><span class="bar-lbl">1970s</span><div class="bar-wrap"><div class="bar-fill" style="width:20%"></div></div><span class="bar-val" style="color:var(--t3);">7 titles</span></div>
     </div>
     <div class="rec">
       <div class="rec-lbl">Implication</div>
@@ -449,10 +450,10 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
     <p class="body-text" style="margin-bottom:14px;">192 titles with release years of 2026 or later already appear in TMDB trending data. A popularity score above 200 is identified as a blockbuster-level signal. Top five titles by current pre-release popularity:</p>
     <div style="margin-bottom:12px;">
       <div class="buzz-row"><span class="buzz-rank">#1</span><span class="buzz-title">Your Heart Will Be Broken<span class="buzz-year">2026</span></span><span class="buzz-score">1,340.9</span></div>
-      <div class="buzz-row"><span class="buzz-rank">#2</span><span class="buzz-title">Avatar: Fire and Ash<span class="buzz-year">2025</span></span><span class="buzz-score">397.8</span></div>
-      <div class="buzz-row"><span class="buzz-rank">#3</span><span class="buzz-title">Project Hail Mary<span class="buzz-year">2026</span></span><span class="buzz-score">314.9</span></div>
-      <div class="buzz-row"><span class="buzz-rank">#4</span><span class="buzz-title">Scream 7<span class="buzz-year">2026</span></span><span class="buzz-score">245.2</span></div>
-      <div class="buzz-row"><span class="buzz-rank">#5</span><span class="buzz-title">Peaky Blinders: The Immortal Man<span class="buzz-year">2026</span></span><span class="buzz-score">230.4</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#2</span><span class="buzz-title">Mike &amp; Nick &amp; Nick &amp; Alice<span class="buzz-year">2026</span></span><span class="buzz-score">382.9</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#3</span><span class="buzz-title">Pretty Lethal<span class="buzz-year">2026</span></span><span class="buzz-score">343.0</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#4</span><span class="buzz-title">Shelter<span class="buzz-year">2026</span></span><span class="buzz-score">321.9</span></div>
+      <div class="buzz-row"><span class="buzz-rank">#5</span><span class="buzz-title">Project Hail Mary<span class="buzz-year">2026</span></span><span class="buzz-score">315.0</span></div>
     </div>
     <div class="rec">
       <div class="rec-lbl">Implication</div>
@@ -468,16 +469,16 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
       <div>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
           <span class="q-tag">IV · Audience Insight</span>
-          <span class="badge b-amber">Declining Satisfaction</span>
+          <span class="badge b-amber">Read With Caution</span>
         </div>
-        <h2>Audience ratings have declined 0.50 points since 2020 despite a 10× rise in popularity</h2>
+        <h2>Recent releases rate lower, but vote counts and survivorship explain much of the gap</h2>
       </div>
       <div style="text-align:right;flex-shrink:0;">
-        <div class="big-num" style="color:var(--warn);">10×</div>
-        <div class="big-lbl">popularity growth · 2021–2026</div>
+        <div class="big-num" style="color:var(--warn);">3,116 → 115</div>
+        <div class="big-lbl">median votes · 2018 vs 2026 releases</div>
       </div>
     </div>
-    <p class="body-text" style="margin-bottom:14px;">Average ratings peaked at 7.16 in 2020 and have declined to 6.66 in 2026. Over the same period, average popularity increased approximately tenfold. Discovery volume is rising while per-title satisfaction is falling.</p>
+    <p class="body-text" style="margin-bottom:14px;">Average ratings peaked at 7.16 for 2020 releases and are 6.66 for 2026 releases. This does not show that audiences are rating more harshly. Recent films have far fewer votes (median 3,116 for 2018 releases vs 115 for 2026), and early ratings often shift as more people vote. Older films also only appear in a current popularity list if people are still watching them, which favours well-regarded titles (survivorship). The higher average popularity of recent releases reflects recency, not a rise in demand.</p>
     <div style="margin-bottom:6px;">
       <div class="trend-row"><span class="trend-yr">2018</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:72%;background:rgba(1,180,228,0.45);"></div></div><span class="trend-val">6.86</span></div>
       <div class="trend-row"><span class="trend-yr">2019</span><div class="trend-bar-wrap"><div class="trend-bar" style="width:78%;background:rgba(1,180,228,0.45);"></div></div><span class="trend-val">6.99</span></div>
@@ -492,7 +493,7 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
     <p style="font-size:11px;color:var(--t3);margin-bottom:12px;">*Partial year (n = 56). Records with votes ≥ 50 only.</p>
     <div class="rec">
       <div class="rec-lbl">Implication</div>
-      <div class="rec-text">Volume growth in content discovery is not translating to audience satisfaction. The 2020–2022 rating peak coincided with reduced output during production slowdowns; the subsequent volume increase correlates with declining satisfaction scores. Quality-per-title metrics warrant attention as a complement to volume-based acquisition targets.</div>
+      <div class="rec-text">Treat the decline as a hypothesis, not a finding. To test it, compare films at the same age (for example, ratings one year after release) using a full release-year sample rather than a current popularity list.</div>
     </div>
   </div>
 </div>
@@ -517,15 +518,15 @@ h2 { font-size:17px; font-weight:500; letter-spacing:-0.01em; line-height:1.3; c
     <table class="gem-table" style="margin-bottom:6px;">
       <thead><tr><th>Title</th><th>Rating</th><th>Popularity</th></tr></thead>
       <tbody>
-        <tr><td><span class="gem-title">Seven Samurai</span><span class="gem-year">1954</span></td><td class="gem-rating">8.45</td><td class="gem-pop">16.90</td></tr>
-        <tr><td><span class="gem-title">Life is Beautiful</span><span class="gem-year">1997</span></td><td class="gem-rating">8.44</td><td class="gem-pop">13.80</td></tr>
-        <tr><td><span class="gem-title">City of God</span><span class="gem-year">2002</span></td><td class="gem-rating">8.43</td><td class="gem-pop">14.10</td></tr>
-        <tr><td><span class="gem-title">Paths of Glory</span><span class="gem-year">1957</span></td><td class="gem-rating">8.25</td><td class="gem-pop">5.79</td></tr>
-        <tr><td><span class="gem-title">The Legend of 1900</span><span class="gem-year">1998</span></td><td class="gem-rating">8.24</td><td class="gem-pop">5.79</td></tr>
-        <tr><td><span class="gem-title">Togo</span><span class="gem-year">2019</span></td><td class="gem-rating">8.13</td><td class="gem-pop">5.77</td></tr>
+        <tr><td><span class="gem-title">Nude</span><span class="gem-year">2017</span></td><td class="gem-rating">9.40</td><td class="gem-pop">4.32</td></tr>
+        <tr><td><span class="gem-title">A Dog's Will</span><span class="gem-year">2000</span></td><td class="gem-rating">8.42</td><td class="gem-pop">5.04</td></tr>
+        <tr><td><span class="gem-title">Gabriel's Inferno: Part III</span><span class="gem-year">2020</span></td><td class="gem-rating">8.40</td><td class="gem-pop">4.79</td></tr>
+        <tr><td><span class="gem-title">David Attenborough: A Life on Our Planet</span><span class="gem-year">2020</span></td><td class="gem-rating">8.40</td><td class="gem-pop">4.80</td></tr>
+        <tr><td><span class="gem-title">Impossible Things</span><span class="gem-year">2021</span></td><td class="gem-rating">8.40</td><td class="gem-pop">4.49</td></tr>
+        <tr><td><span class="gem-title">Gabriel's Inferno</span><span class="gem-year">2020</span></td><td class="gem-rating">8.39</td><td class="gem-pop">4.51</td></tr>
       </tbody>
     </table>
-    <p style="font-size:11px;color:var(--t3);margin-bottom:12px;">Top 6 of 62. Full list available in the dashboard.</p>
+    <p style="font-size:11px;color:var(--t3);margin-bottom:12px;">Top 6 of 62 by rating. Full list: filter <span class="pill-code">tmdb_clean.csv</span> on <span class="pill-code">is_hidden_gem = True</span>.</p>
     <div class="rec">
       <div class="rec-lbl">Implication</div>
       <div class="rec-text">A discovery shelf surfacing titles with ratings above 8.0 and below-median popularity is a low-cost retention mechanism. Content with verified quality scores and suppressed visibility requires no additional licensing premium — the investment is in surface placement, not acquisition. Particularly viable for platforms competing against blockbuster-weighted catalogues.</div>

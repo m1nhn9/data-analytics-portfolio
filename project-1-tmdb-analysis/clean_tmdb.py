@@ -15,8 +15,10 @@ import math
 import statistics
 from collections import defaultdict
 
-INPUT  = "/Users/jaidn/Documents/DA Roapmap/tmdb_popular_movies.csv"
-OUTPUT = "/Users/jaidn/Documents/DA Roapmap/tmdb_clean.csv"
+from pathlib import Path
+HERE   = Path(__file__).resolve().parent
+INPUT  = HERE / "tmdb_popular_movies.csv"
+OUTPUT = HERE / "tmdb_clean.csv"
 
 # ── 1. LOAD ──────────────────────────────────────────────────────────────────
 with open(INPUT, newline="", encoding="utf-8") as f:
@@ -140,6 +142,25 @@ print(f"\nPopularity vs Rating (Pearson r, votes≥50): {corr:.4f}")
 print(f"  → {len(reliable_films)} reliable films used")
 print(f"  → Median popularity (reliable): {pop_median:.2f}")
 print(f"  → Overall median popularity:    {overall_median:.2f}")
+
+# Rank (Spearman) correlation: popularity is extremely skewed (a few titles score in the
+# hundreds), and Pearson is sensitive to those outliers. Spearman compares rank order instead.
+def ranks(vals):
+    order = sorted(range(len(vals)), key=lambda i: vals[i])
+    r = [0.0] * len(vals)
+    i = 0
+    while i < len(order):
+        j = i
+        while j + 1 < len(order) and vals[order[j + 1]] == vals[order[i]]:
+            j += 1
+        avg = (i + j) / 2 + 1
+        for k in range(i, j + 1):
+            r[order[k]] = avg
+        i = j + 1
+    return r
+
+spearman = pearson(ranks([p for p,_ in corr_pairs]), ranks([r for _,r in corr_pairs]))
+print(f"Popularity vs Rating (Spearman rank, votes≥50): {spearman:.4f}")
 
 # ── 6. APPLY ALL FIELDS ───────────────────────────────────────────────────────
 for r in clean:
