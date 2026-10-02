@@ -1,0 +1,5 @@
+relationship 0b10d832-9505-4f2f-b981-ff1543551267
+	joinOnDateBehavior: datePartOnly
+	fromColumn: tmdb_clean.release_date
+	toColumn: LocalDateTable_18118ef3-3f6c-4300-ad93-e467c3bcc5ff.Date
+

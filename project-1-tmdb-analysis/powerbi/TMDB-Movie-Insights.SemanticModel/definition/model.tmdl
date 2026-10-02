@@ -1,0 +1,18 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["DataFolder","tmdb_clean"]
+
+annotation PBI_ProTooling = ["WebModelingEdit","DaxQueryView_Desktop","TMDLView_Desktop"]
+
+ref table tmdb_clean
+ref table DateTableTemplate_35efa807-49cb-420b-88d5-67eb0d96e579
+ref table LocalDateTable_18118ef3-3f6c-4300-ad93-e467c3bcc5ff
+

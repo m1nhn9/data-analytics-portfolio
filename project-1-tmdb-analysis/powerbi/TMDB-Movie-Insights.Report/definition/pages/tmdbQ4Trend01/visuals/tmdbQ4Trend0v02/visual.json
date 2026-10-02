@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "tmdbQ4Trend0v02",
+  "position": {
+    "x": 24,
+    "y": 632,
+    "z": 2,
+    "width": 1232,
+    "height": 64,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Caveat: recent releases have had far less time to collect votes (median votes fall from ~2,800 for 2018 films to almost none for 2026), so fewer of them pass the reliability threshold and their averages are less settled. Older years keep only the films that survived and kept attracting votes (vote-count / survivorship bias).",
+                    "textStyle": {
+                      "fontSize": "11pt",
+                      "color": "#605E5C",
+                      "fontStyle": "italic"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

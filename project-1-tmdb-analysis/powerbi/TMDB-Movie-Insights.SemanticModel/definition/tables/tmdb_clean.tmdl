@@ -1,0 +1,218 @@
+table tmdb_clean
+	lineageTag: 455c4aef-35fd-46de-bbf9-42373de15271
+
+	measure Films = COUNTROWS(tmdb_clean)
+		formatString: #,0
+		lineageTag: b0dc6177-9307-4437-821a-2278c4562b74
+
+	measure 'Hidden Gems' = CALCULATE([Films], tmdb_clean[is_hidden_gem] = TRUE())
+		formatString: 0
+		lineageTag: 4be40fdb-8487-4340-ac76-702d7db365a7
+
+	measure 'Evergreen Films' = CALCULATE([Films], tmdb_clean[is_evergreen] = TRUE())
+		formatString: 0
+		lineageTag: 6dbcc2b1-858e-4a4c-93c9-3609acd453bd
+
+	measure 'Films 2026+' = CALCULATE([Films], tmdb_clean[year] >= 2026)
+		formatString: 0
+		lineageTag: 97a94551-9372-4e25-a36d-3c916939f63f
+
+	measure 'Reliable Films' = CALCULATE([Films], tmdb_clean[is_reliable] = TRUE())
+		formatString: 0
+		lineageTag: 9f3d1a07-99d4-418c-bba6-ed5a0353518c
+
+	measure 'Avg Rating' = CALCULATE(AVERAGE(tmdb_clean[rating]), tmdb_clean[is_reliable] = TRUE())
+		formatString: 0.00
+		lineageTag: bbe71f88-4976-4060-8891-49e4c7f9bfa5
+
+	measure 'Median Votes' = MEDIAN(tmdb_clean[votes])
+		formatString: #,0
+		lineageTag: 187ba45e-bd3d-4a44-95a8-430fa1e77e3a
+
+	measure 'Upcoming Films' = CALCULATE([Films], tmdb_clean[is_upcoming] = TRUE())
+		formatString: 0
+		lineageTag: 31371de9-9294-45e3-a52b-0093d7bc7494
+
+	measure 'Correlation Note' = "Pearson r 0.079 · Spearman ρ 0.230 (computed in Python)"
+		lineageTag: 5decb067-1323-405a-869a-83955fe643c2
+
+	measure 'Vote Caveat' = "Caveat: recent releases have far fewer votes, so 2025–2026 averages are less settled (vote-count / survivorship bias)."
+		lineageTag: fb236282-e88f-4ba2-b482-5b8e480f30a5
+
+	measure 'Upcoming Popularity' = CALCULATE(SUM(tmdb_clean[popularity]), tmdb_clean[is_upcoming] = TRUE())
+		formatString: #,0.0
+		lineageTag: 623c1e3c-adfe-47df-8b11-f454b30692bf
+
+	measure 'Top 5 Upcoming Popularity' =
+			VAR p = [Upcoming Popularity]
+			VAR r = RANKX(FILTER(ALL(tmdb_clean[title]), [Upcoming Popularity] > 0), [Upcoming Popularity], , DESC)
+			RETURN IF(p > 0 && r <= 5, p)
+		formatString: #,0.0
+		lineageTag: f6a8549e-1aef-48bd-be42-9e879ef844e5
+
+	measure 'Top 10 Popularity' =
+			VAR p = SUM(tmdb_clean[popularity])
+			VAR higher = COUNTROWS(FILTER(ALLSELECTED(tmdb_clean), tmdb_clean[popularity] > p))
+			RETURN IF(NOT ISBLANK(p) && higher < 10, p)
+		formatString: #,0.0
+		lineageTag: 2d8c25b6-df31-4109-954b-7a52c4505ae3
+
+	measure 'Avg Popularity' = AVERAGE(tmdb_clean[popularity])
+		formatString: #,0.0
+		lineageTag: e54eca5e-af5b-4cfa-a576-021bc03394c5
+
+	measure 'Release Date' = FORMAT(MIN(tmdb_clean[release_date]), "dd mmm yyyy")
+		lineageTag: f7cd2866-7ee3-4d73-8a73-c28699469ece
+
+	column title
+		dataType: string
+		lineageTag: 94c4d056-b0a0-47e9-9593-6874ee5e368a
+		summarizeBy: none
+		sourceColumn: title
+
+		annotation SummarizationSetBy = Automatic
+
+	column release_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: fd808442-4904-4936-9c91-75f5e65f83e4
+		summarizeBy: none
+		sourceColumn: release_date
+
+		variation Variation
+			isDefault
+			relationship: 0b10d832-9505-4f2f-b981-ff1543551267
+			defaultHierarchy: LocalDateTable_18118ef3-3f6c-4300-ad93-e467c3bcc5ff.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column year
+		dataType: int64
+		formatString: 0
+		lineageTag: dff57ea9-603d-462a-9db6-fea9ef243026
+		summarizeBy: sum
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column decade
+		dataType: string
+		lineageTag: 16752cbe-f0ca-4a8d-800f-628412c7776e
+		summarizeBy: none
+		sourceColumn: decade
+
+		annotation SummarizationSetBy = Automatic
+
+	column popularity
+		dataType: double
+		lineageTag: 274d7127-3d81-43b5-88ff-33d640c5562a
+		summarizeBy: sum
+		sourceColumn: popularity
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column popularity_tier
+		dataType: string
+		lineageTag: 6679c409-6d1f-4214-a15c-b09556814fb2
+		summarizeBy: none
+		sourceColumn: popularity_tier
+
+		annotation SummarizationSetBy = Automatic
+
+	column rating
+		dataType: double
+		lineageTag: fc46b067-a3c6-4449-bbc5-f7f6c9a187e6
+		summarizeBy: sum
+		sourceColumn: rating
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column rating_quality
+		dataType: string
+		lineageTag: f8986209-888b-4c3b-9e6c-f6314d6e139f
+		summarizeBy: none
+		sourceColumn: rating_quality
+
+		annotation SummarizationSetBy = Automatic
+
+	column votes
+		dataType: int64
+		formatString: 0
+		lineageTag: 96671bfb-ed63-4c03-8431-9de1fb4e9a57
+		summarizeBy: sum
+		sourceColumn: votes
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_reliable
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: bca6c732-0e8e-4a14-bebb-9b08c2412bad
+		summarizeBy: none
+		sourceColumn: is_reliable
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_upcoming
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 4c333d2b-b9eb-427c-9701-3a38e10bc616
+		summarizeBy: none
+		sourceColumn: is_upcoming
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_evergreen
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 64faaadc-919c-490e-842f-48413055b593
+		summarizeBy: none
+		sourceColumn: is_evergreen
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_hidden_gem
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ebbc821f-9c7c-463c-af11-395ed7b91b67
+		summarizeBy: none
+		sourceColumn: is_hidden_gem
+
+		annotation SummarizationSetBy = Automatic
+
+	column quadrant
+		dataType: string
+		lineageTag: 5067f7ac-64b6-4023-9ef3-78d0f902f54c
+		summarizeBy: none
+		sourceColumn: quadrant
+
+		annotation SummarizationSetBy = Automatic
+
+	column pop_vs_rating_corr
+		dataType: double
+		lineageTag: 05830740-06bc-4bc8-b2b7-31d8998572aa
+		summarizeBy: sum
+		sourceColumn: pop_vs_rating_corr
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition tmdb_clean = m
+		mode: import
+		source =
+				  let
+				    Source = Csv.Document(File.Contents(DataFolder & "tmdb_clean.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed column type" = Table.TransformColumnTypes(#"Promoted headers", {{"title", type text}, {"release_date", type date}, {"year", Int64.Type}, {"decade", type text}, {"popularity", type number}, {"popularity_tier", type text}, {"rating", type number}, {"rating_quality", type text}, {"votes", Int64.Type}, {"is_reliable", type logical}, {"is_upcoming", type logical}, {"is_evergreen", type logical}, {"is_hidden_gem", type logical}, {"quadrant", type text}, {"pop_vs_rating_corr", type number}})
+				  in
+				    #"Changed column type"
+
+	annotation PBI_ResultType = Table
+

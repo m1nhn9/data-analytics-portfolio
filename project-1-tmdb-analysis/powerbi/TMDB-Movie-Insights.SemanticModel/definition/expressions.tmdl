@@ -1,0 +1,5 @@
+/// Folder that holds tmdb_clean.csv. Must end with a path separator.
+expression DataFolder = "C:\PowerBI\data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 6f1d2c4e-0d5b-4b7a-9a51-911872206471
+
+	annotation PBI_ResultType = Text

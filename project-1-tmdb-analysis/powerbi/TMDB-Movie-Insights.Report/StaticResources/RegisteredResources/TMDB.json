@@ -1,0 +1,78 @@
+{
+  "name": "TMDB",
+  "dataColors": [
+    "#01B4E4",
+    "#90CEA1",
+    "#0D253F",
+    "#3CBEC9",
+    "#1E6FA8",
+    "#5FC9B0",
+    "#7FD8F0",
+    "#B7E4C7"
+  ],
+  "foreground": "#0D253F",
+  "foregroundNeutralSecondary": "#4A5A6A",
+  "background": "#FFFFFF",
+  "backgroundLight": "#EEF3F6",
+  "tableAccent": "#01B4E4",
+  "good": "#90CEA1",
+  "neutral": "#01B4E4",
+  "bad": "#E4572E",
+  "textClasses": {
+    "title": {
+      "color": "#0D253F"
+    },
+    "header": {
+      "color": "#0D253F"
+    },
+    "label": {
+      "color": "#4A5A6A"
+    },
+    "callout": {
+      "color": "#0D253F"
+    }
+  },
+  "visualStyles": {
+    "tableEx": {
+      "*": {
+        "columnHeaders": [
+          {
+            "backColor": {
+              "solid": {
+                "color": "#0D253F"
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            }
+          }
+        ],
+        "values": [
+          {
+            "backColorPrimary": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "backColorSecondary": {
+              "solid": {
+                "color": "#EAF7EE"
+              }
+            }
+          }
+        ],
+        "grid": [
+          {
+            "gridHorizontalColor": {
+              "solid": {
+                "color": "#D3E3EC"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -10,7 +10,7 @@ AI & Business Analytics student at the University of South Florida. I use data t
 |---|---|
 | **Goal** | Transition into Product Management in the tech industry |
 | **Focus** | Full ETL pipeline · Interactive dashboards · Business insights |
-| **Stack** | Python · SQL · Tableau · Git/GitHub |
+| **Stack** | Python · SQL · Tableau · Power BI · Git/GitHub |
 
 ---
 
@@ -25,7 +25,7 @@ AI & Business Analytics student at the University of South Florida. I use data t
 | **Data source** | TMDB (The Movie Database) API |
 | **Raw rows** | 5,000 |
 | **Clean rows** | 4,682 |
-| **Tools** | Python (stdlib) |
+| **Tools** | Python (stdlib) · Power BI |
 
 **Key finding:** Popularity and audience rating are only weakly related: Pearson **r = 0.079**, Spearman rank **ρ = 0.230** (3,981 films with ≥ 50 votes). Trending content does not reliably satisfy audiences.
 
@@ -38,6 +38,13 @@ AI & Business Analytics student at the University of South Florida. I use data t
 | [`clean_tmdb.py`](./project-1-tmdb-analysis/clean_tmdb.py) | Data cleaning + feature engineering script |
 | [`tmdb_popular_movies.csv`](./project-1-tmdb-analysis/tmdb_popular_movies.csv) | Raw dataset (5,000 rows) |
 | [`tmdb_clean.csv`](./project-1-tmdb-analysis/tmdb_clean.csv) | Cleaned dataset (4,682 rows × 15 cols) |
+| [`powerbi/`](./project-1-tmdb-analysis/powerbi) | Power BI project: catalogue dashboard, detail pages and insights (open the `.pbip` in Power BI Desktop) |
+
+#### Power BI dashboard
+
+![TMDB Movie Insights Power BI dashboard](./project-1-tmdb-analysis/powerbi/dashboard.png)
+
+KPI header with filters, then releases and ratings by year, popularity vs rating, catalogue mix, a top 10 trending list, an upcoming releases watchlist and a hidden-gem shortlist. See [`powerbi/README.md`](./project-1-tmdb-analysis/powerbi/README.md) for how to open it.
 
 ---
 
